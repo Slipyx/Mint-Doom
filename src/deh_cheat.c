@@ -84,7 +84,7 @@ static void DEH_CheatParseLine(deh_context_t *context, char *line, void *tag)
     char *variable_name;
     char *value;
     unsigned char *unsvalue;
-    unsigned int i;
+    uint32_t i;
 
     if (!DEH_ParseAssignment(line, &variable_name, &value))
     {

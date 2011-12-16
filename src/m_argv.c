@@ -33,10 +33,8 @@
 #include "i_system.h"
 #include "m_misc.h"
 
-int		myargc;
-char**		myargv;
-
-
+uint32_t        myargc;
+char**          myargv;
 
 
 //
@@ -47,14 +45,16 @@ char**		myargv;
 // or 0 if not present
 //
 
-int M_CheckParmWithArgs(char *check, int num_args)
+uint32_t M_CheckParmWithArgs(char *check, uint32_t num_args)
 {
-    int i;
+    uint32_t i;
 
-    for (i = 1; i < myargc - num_args; i++)
+    for (i=1; i<myargc-num_args; i++)
     {
-	if (!strcasecmp(check, myargv[i]))
-	    return i;
+        if (!strcasecmp(check, myargv[i]))
+        {
+            return i;
+        }
     }
 
     return 0;
@@ -66,17 +66,17 @@ int M_CheckParm(char *check)
 }
 
 #define MAXARGVS        100
-	
-static void LoadResponseFile(int argv_index)
+
+static void LoadResponseFile(uint32_t argv_index)
 {
     FILE *handle;
-    int size;
+    uint32_t size;
     char *infile;
     char *file;
     char *response_filename;
     char **newargv;
     int newargc;
-    int i, k;
+    uint32_t i, k;
 
     response_filename = myargv[argv_index] + 1;
 
@@ -124,11 +124,11 @@ static void LoadResponseFile(int argv_index)
     infile = file;
     k = 0;
 
-    while(k < size)
+    while (k < size)
     {
         // Skip past space characters to the next argument
 
-        while(k < size && isspace(infile[k]))
+        while (k < size && isspace(infile[k]))
         {
             ++k;
         } 
@@ -173,7 +173,7 @@ static void LoadResponseFile(int argv_index)
 
             newargv[newargc++] = &infile[k];
 
-            while(k < size && !isspace(infile[k]))
+            while (k < size && !isspace(infile[k]))
             {
                 ++k;
             }
@@ -188,7 +188,7 @@ static void LoadResponseFile(int argv_index)
 
     // Add arguments following the response file argument
 
-    for (i=argv_index + 1; i<myargc; ++i)
+    for (i=argv_index+1; i<myargc; ++i)
     {
         newargv[newargc] = myargv[i];
         ++newargc;
@@ -216,9 +216,9 @@ static void LoadResponseFile(int argv_index)
 
 void M_FindResponseFile(void)
 {
-    int             i;
+    uint32_t i;
 
-    for (i = 1; i < myargc; i++)
+    for (i=1; i<myargc; i++)
     {
         if (myargv[i][0] == '@')
         {
@@ -226,4 +226,3 @@ void M_FindResponseFile(void)
         }
     }
 }
-

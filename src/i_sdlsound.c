@@ -331,7 +331,7 @@ static boolean LoadSoundLump(int sound,
 			     uint32_t *length,
 			     byte **data_ref)
 {
-    int lumplen;
+    uint32_t lumplen;
     byte *data;
 
     // Load the sound

@@ -69,9 +69,9 @@ typedef struct
     query_target_state_t state;
     net_addr_t *addr;
     net_querydata_t data;
-    unsigned int ping_time;
-    unsigned int query_time;
-    unsigned int query_attempts;
+    uint32_t ping_time;
+    uint32_t query_time;
+    uint32_t query_attempts;
     boolean printed;
 } query_target_t;
 
@@ -81,11 +81,11 @@ static boolean registered_with_master = false;
 
 static net_context_t *query_context;
 static query_target_t *targets;
-static int num_targets;
+static uint32_t num_targets;
 
 static boolean query_loop_running = false;
 static boolean printed_header = false;
-static int last_query_time = 0;
+static int32_t last_query_time = 0;
 
 // Resolve the master server address.
 
@@ -121,8 +121,8 @@ void NET_Query_AddToMaster(net_addr_t *master_addr)
 
 void NET_Query_MasterResponse(net_packet_t *packet)
 {
-    unsigned int packet_type;
-    unsigned int result;
+    uint32_t packet_type;
+    uint32_t result;
 
     if (!NET_ReadInt16(packet, &packet_type)
      || !NET_ReadInt16(packet, &result))
@@ -171,7 +171,7 @@ static void NET_Query_SendMasterQuery(net_addr_t *addr)
 static query_target_t *GetTargetForAddr(net_addr_t *addr, boolean create)
 {
     query_target_t *target;
-    int i;
+    uint32_t i;
 
     for (i=0; i<num_targets; ++i)
     {
@@ -224,7 +224,7 @@ static void NET_Query_ParseResponse(net_addr_t *addr, net_packet_t *packet,
                                     net_query_callback_t callback,
                                     void *user_data)
 {
-    unsigned int packet_type;
+    uint32_t packet_type;
     net_querydata_t querydata;
     query_target_t *target;
 
@@ -293,7 +293,7 @@ static void NET_Query_ParseResponse(net_addr_t *addr, net_packet_t *packet,
 static void NET_Query_ParseMasterResponse(net_addr_t *master_addr,
                                           net_packet_t *packet)
 {
-    unsigned int packet_type;
+    uint32_t packet_type;
     query_target_t *target;
     char *addr_str;
     net_addr_t *addr;
@@ -372,8 +372,8 @@ static void NET_Query_GetResponse(net_query_callback_t callback,
 
 static void SendOneQuery(void)
 {
-    unsigned int now;
-    unsigned int i;
+    uint32_t now;
+    uint32_t i;
 
     now = I_GetTimeMS();
 
@@ -384,7 +384,7 @@ static void SendOneQuery(void)
         return;
     }
 
-    for (i = 0; i < num_targets; ++i)
+    for (i=0; i<num_targets; ++i)
     {
         // Not queried yet?
         // Or last query timed out without a response?
@@ -432,12 +432,12 @@ static void SendOneQuery(void)
 
 static void CheckTargetTimeouts(void)
 {
-    unsigned int i;
-    unsigned int now;
+    uint32_t i;
+    uint32_t now;
 
     now = I_GetTimeMS();
 
-    for (i = 0; i < num_targets; ++i)
+    for (i=0; i<num_targets; ++i)
     {
         /*
         printf("target %i: state %i, queries %i, query time %i\n",
@@ -468,9 +468,9 @@ static void CheckTargetTimeouts(void)
 
 static boolean AllTargetsDone(void)
 {
-    unsigned int i;
+    uint32_t i;
 
-    for (i = 0; i < num_targets; ++i)
+    for (i=0; i<num_targets; ++i)
     {
         if (targets[i].state != QUERY_TARGET_RESPONDED
          && targets[i].state != QUERY_TARGET_NO_RESPONSE)
@@ -539,7 +539,7 @@ void NET_Query_Init(void)
 // Callback that exits the query loop when the first server is found.
 
 static void NET_Query_ExitCallback(net_addr_t *addr, net_querydata_t *data,
-                                   unsigned int ping_time, void *user_data)
+                                   uint32_t ping_time, void *user_data)
 {
     NET_Query_ExitLoop();
 }
@@ -549,9 +549,9 @@ static void NET_Query_ExitCallback(net_addr_t *addr, net_querydata_t *data,
 
 static query_target_t *FindFirstResponder(void)
 {
-    unsigned int i;
+    uint32_t i;
 
-    for (i = 0; i < num_targets; ++i)
+    for (i=0; i<num_targets; ++i)
     {
         if (targets[i].type == QUERY_TARGET_SERVER
          && targets[i].state == QUERY_TARGET_RESPONDED)
@@ -565,14 +565,14 @@ static query_target_t *FindFirstResponder(void)
 
 // Return a count of the number of responses.
 
-static int GetNumResponses(void)
+static int32_t GetNumResponses(void)
 {
-    unsigned int i;
-    int result;
+    uint32_t i;
+    int32_t result;
 
     result = 0;
 
-    for (i = 0; i < num_targets; ++i)
+    for (i=0; i<num_targets; ++i)
     {
         if (targets[i].type == QUERY_TARGET_SERVER
          && targets[i].state == QUERY_TARGET_RESPONDED)
@@ -584,7 +584,7 @@ static int GetNumResponses(void)
     return result;
 }
 
-int NET_StartLANQuery(void)
+int32_t NET_StartLANQuery(void)
 {
     query_target_t *target;
 
@@ -598,7 +598,7 @@ int NET_StartLANQuery(void)
     return 1;
 }
 
-int NET_StartMasterQuery(void)
+int32_t NET_StartMasterQuery(void)
 {
     net_addr_t *master;
     query_target_t *target;
@@ -622,10 +622,10 @@ int NET_StartMasterQuery(void)
 
 // -----------------------------------------------------------------------
 
-static void formatted_printf(int wide, char *s, ...)
+static void formatted_printf(int32_t wide, char *s, ...)
 {
     va_list args;
-    int i;
+    int32_t i;
 
     va_start(args, s);
     i = vprintf(s, args);
@@ -662,7 +662,7 @@ static char *GameDescription(GameMode_t mode, GameMission_t mission)
 
 static void PrintHeader(void)
 {
-    int i;
+    int32_t i;
 
     putchar('\n');
     formatted_printf(5, "Ping");
@@ -671,7 +671,9 @@ static void PrintHeader(void)
     puts("Description");
 
     for (i=0; i<70; ++i)
+    {
         putchar('=');
+    }
     putchar('\n');
 }
 
@@ -679,7 +681,7 @@ static void PrintHeader(void)
 
 static void NET_QueryPrintCallback(net_addr_t *addr,
                                    net_querydata_t *data,
-                                   unsigned int ping_time,
+                                   uint32_t ping_time,
                                    void *user_data)
 {
     // If this is the first server, print the header.

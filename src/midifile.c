@@ -40,33 +40,33 @@
 typedef struct
 {
     byte chunk_id[4];
-    unsigned int chunk_size;
+    uint32_t chunk_size;
 } PACKEDATTR chunk_header_t;
 
 typedef struct
 {
     chunk_header_t chunk_header;
-    unsigned short format_type;
-    unsigned short num_tracks;
-    unsigned short time_division;
+    uint16_t format_type;
+    uint16_t num_tracks;
+    uint16_t time_division;
 } PACKEDATTR midi_header_t;
 
 typedef struct
 {
     // Length in bytes:
 
-    unsigned int data_len;
+    uint32_t data_len;
 
     // Events in this track:
 
     midi_event_t *events;
-    int num_events;
+    uint32_t num_events;
 } midi_track_t;
 
 struct midi_track_iter_s
 {
     midi_track_t *track;
-    unsigned int position;
+    uint32_t position;
 };
 
 struct midi_file_s
@@ -75,11 +75,11 @@ struct midi_file_s
 
     // All tracks in this file:
     midi_track_t *tracks;
-    unsigned int num_tracks;
+    uint32_t num_tracks;
 
     // Data buffer used to store data read for SysEx or meta events:
     byte *buffer;
-    unsigned int buffer_size;
+    uint32_t buffer_size;
 };
 
 // Check the header of a chunk:
@@ -490,7 +490,7 @@ static boolean ReadTrack(midi_track_t *track, FILE *stream)
 
 static void FreeTrack(midi_track_t *track)
 {
-    unsigned int i;
+    uint32_t i;
 
     for (i=0; i<track->num_events; ++i)
     {
@@ -567,7 +567,7 @@ static boolean ReadFileHeader(midi_file_t *file, FILE *stream)
 
 void MIDI_FreeFile(midi_file_t *file)
 {
-    int i;
+    uint32_t i;
 
     if (file->tracks != NULL)
     {
