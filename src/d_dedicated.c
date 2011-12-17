@@ -47,8 +47,8 @@ void NET_CL_Run(void)
 //
 // We have our own I_Error function for the dedicated server.  
 // The normal one does extra things like shutdown graphics, etc.
-
-void I_Error (char *error, ...)
+//
+void I_Error(char *error, ...)
 {
     va_list	argptr;
 
@@ -64,7 +64,6 @@ void I_Error (char *error, ...)
     exit(-1);
 }
 
-
 void D_DoomMain(void)
 {
     printf(PACKAGE_NAME " standalone dedicated server\n");
@@ -73,4 +72,3 @@ void D_DoomMain(void)
 
     NET_DedicatedServer();
 }
-

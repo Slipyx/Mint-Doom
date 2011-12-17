@@ -33,8 +33,8 @@
 #include "i_system.h"
 #include "m_misc.h"
 
-uint32_t        myargc;
-char**          myargv;
+uint32_t    myargc;
+char        **myargv;
 
 
 //
@@ -44,7 +44,6 @@ char**          myargv;
 // Returns the argument number (1 to argc-1)
 // or 0 if not present
 //
-
 uint32_t M_CheckParmWithArgs(char *check, uint32_t num_args)
 {
     uint32_t i;
@@ -60,23 +59,23 @@ uint32_t M_CheckParmWithArgs(char *check, uint32_t num_args)
     return 0;
 }
 
-int M_CheckParm(char *check)
+uint32_t M_CheckParm(char *check)
 {
     return M_CheckParmWithArgs(check, 0);
 }
 
-#define MAXARGVS        100
+#define MAXARGVS    100
 
 static void LoadResponseFile(uint32_t argv_index)
 {
-    FILE *handle;
-    uint32_t size;
-    char *infile;
-    char *file;
-    char *response_filename;
-    char **newargv;
-    int newargc;
-    uint32_t i, k;
+    FILE        *handle;
+    uint32_t    size;
+    char        *infile;
+    char        *file;
+    char        *response_filename;
+    char        **newargv;
+    uint32_t    newargc;
+    uint32_t    i, k;
 
     response_filename = myargv[argv_index] + 1;
 
@@ -85,7 +84,7 @@ static void LoadResponseFile(uint32_t argv_index)
 
     if (handle == NULL)
     {
-        printf ("\nNo such response file!");
+        printf("\nNo such response file!");
         exit(1);
     }
 
@@ -95,7 +94,7 @@ static void LoadResponseFile(uint32_t argv_index)
 
     // Read in the entire file
     // Allocate one byte extra - this is in case there is an argument
-    // at the end of the response file, in which case a '\0' will be 
+    // at the end of the response file, in which case a '\0' will be
     // needed.
 
     file = malloc(size + 1);
@@ -120,7 +119,7 @@ static void LoadResponseFile(uint32_t argv_index)
         newargv[i] = myargv[i];
         ++newargc;
     }
-    
+
     infile = file;
     k = 0;
 
@@ -158,7 +157,7 @@ static void LoadResponseFile(uint32_t argv_index)
 
             if (k >= size || infile[k] == '\n') 
             {
-                I_Error("Quotes unclosed in response file '%s'", 
+                I_Error("Quotes unclosed in response file '%s'",
                         response_filename);
             }
 

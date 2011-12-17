@@ -27,6 +27,8 @@
 #ifndef OPL_OPL_H
 #define OPL_OPL_H
 
+#include <inttypes.h>
+
 typedef void (*opl_callback_t)(void *data);
 
 typedef enum

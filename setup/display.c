@@ -50,7 +50,7 @@ static pixel_depth_t pixel_depths[] =
 // List of strings containing supported pixel depths.
 
 static char **supported_bpps;
-static int num_supported_bpps;
+static uint32_t num_supported_bpps;
 
 typedef struct 
 {
@@ -237,9 +237,9 @@ static int GetSelectedBPP(void)
 
 static int GetSupportedBPPIndex(char *description)
 {
-    unsigned int i;
+    uint32_t i;
 
-    for (i = 0; i < num_supported_bpps; ++i)
+    for (i=0; i<num_supported_bpps; ++i)
     {
         if (supported_bpps[i] == description)
         {
@@ -631,7 +631,7 @@ void ConfigDisplay(void)
     txt_table_t *bpp_table;
     txt_window_action_t *advanced_button;
     txt_checkbox_t *fs_checkbox;
-    int i;
+    uint32_t i;
     int num_columns;
     int num_rows;
     int window_y;
@@ -687,7 +687,7 @@ void ConfigDisplay(void)
                        bpp_table = TXT_NewTable(4),
                        NULL);
 
-        for (i = 0; i < num_supported_bpps; ++i)
+        for (i=0; i<num_supported_bpps; ++i)
         {
             txt_radiobutton_t *button;
 

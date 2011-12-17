@@ -65,16 +65,16 @@ static SDL_mutex *callback_queue_mutex = NULL;
 
 // Current time, in number of samples since startup:
 
-static int current_time;
+static uint32_t current_time;
 
 // If non-zero, playback is currently paused.
 
-static int opl_sdl_paused;
+static int32_t opl_sdl_paused;
 
 // Time offset (in samples) due to the fact that callbacks
 // were previously paused.
 
-static unsigned int pause_offset;
+static uint32_t pause_offset;
 
 // OPL software emulator structure.
 

@@ -578,7 +578,7 @@ static void LoadDefaultCollection(default_collection_t *collection)
                     break;
 
                 case DEFAULT_FLOAT:
-                    * (float *) def->location = atof(strparm);
+                    * (float *) def->location = (float)atof(strparm);
                     break;
             }
 

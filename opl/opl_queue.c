@@ -36,13 +36,13 @@ typedef struct
 {
     opl_callback_t callback;
     void *data;
-    unsigned int time;
+    uint32_t time;
 } opl_queue_entry_t;
 
 struct opl_callback_queue_s
 {
     opl_queue_entry_t entries[MAX_OPL_QUEUE];
-    unsigned int num_entries;
+    uint32_t num_entries;
 };
 
 opl_callback_queue_t *OPL_Queue_Create(void)
@@ -119,12 +119,12 @@ void OPL_Queue_Push(opl_callback_queue_t *queue,
     queue->entries[entry_id].time = time;
 }
 
-int OPL_Queue_Pop(opl_callback_queue_t *queue,
-                  opl_callback_t *callback, void **data)
+int32_t OPL_Queue_Pop(opl_callback_queue_t *queue,
+                      opl_callback_t *callback, void **data)
 {
     opl_queue_entry_t *entry;
-    int child1, child2;
-    int i, next_i;
+    uint32_t child1, child2;
+    uint32_t i, next_i;
 
     // Empty?
 
@@ -197,7 +197,7 @@ int OPL_Queue_Pop(opl_callback_queue_t *queue,
     return 1;
 }
 
-unsigned int OPL_Queue_Peek(opl_callback_queue_t *queue)
+uint32_t OPL_Queue_Peek(opl_callback_queue_t *queue)
 {
     if (queue->num_entries > 0)
     {

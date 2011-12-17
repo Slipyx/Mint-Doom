@@ -39,7 +39,7 @@ typedef enum
 
 static SDL_Thread *timer_thread = NULL;
 static thread_state_t timer_thread_state;
-static int current_time;
+static uint32_t current_time;
 
 // If non-zero, callbacks are currently paused.
 
@@ -48,7 +48,7 @@ static int opl_timer_paused;
 // Offset in milliseconds to adjust time due to the fact that playback
 // was paused.
 
-static unsigned int pause_offset = 0;
+static uint32_t pause_offset = 0;
 
 // Queue of callbacks waiting to be invoked.
 // The callback queue mutex is held while the callback queue structure
@@ -66,7 +66,7 @@ static SDL_mutex *timer_mutex;
 // to be invoked.  Otherwise, next_time is set to the time when the
 // timer thread must wake up again to check.
 
-static int CallbackWaiting(unsigned int *next_time)
+static int32_t CallbackWaiting(uint32_t *next_time)
 {
     // If paused, just wait in 50ms increments until unpaused.
     // Update pause_offset so after we unpause, the callback 

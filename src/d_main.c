@@ -88,57 +88,57 @@
 //  calls all ?_Responder, ?_Ticker, and ?_Drawer,
 //  calls I_GetTime, I_StartFrame, and I_StartTic
 //
-void D_DoomLoop (void);
+void D_DoomLoop(void);
 
 // Location where savegames are stored
 
-char *          savegamedir;
+char    *savegamedir;
 
 // location of IWAD and WAD files
 
-char *          iwadfile;
+char    *iwadfile;
 
 
-boolean		devparm;	// started game with -devparm
-boolean         nomonsters;	// checkparm of -nomonsters
-boolean         respawnparm;	// checkparm of -respawn
-boolean         fastparm;	// checkparm of -fast
+boolean    devparm;	// started game with -devparm
+boolean    nomonsters;	// checkparm of -nomonsters
+boolean    respawnparm;	// checkparm of -respawn
+boolean    fastparm;	// checkparm of -fast
 
-boolean		singletics = false; // debug flag to cancel adaptiveness
+boolean    singletics = false; // debug flag to cancel adaptiveness
 
 
 // If true, game is running as a screensaver
 
-boolean         screensaver_mode = false;
+boolean    screensaver_mode = false;
 
 
 //extern int soundVolume;
 //extern  int	sfxVolume;
 //extern  int	musicVolume;
 
-extern  boolean	inhelpscreens;
+extern boolean    inhelpscreens;
 
-skill_t		startskill;
-int             startepisode;
-int		startmap;
-boolean		autostart;
-int             startloadgame;
+skill_t    startskill;
+int32_t    startepisode;
+int32_t    startmap;
+boolean    autostart;
+int32_t    startloadgame;
 
-boolean		advancedemo;
+boolean    advancedemo;
 
 // Store demo, do not accept any inputs
 
-boolean         storedemo;
+boolean    storedemo;
 
 
-char		wadfile[1024];		// primary wad file
-char		mapdir[1024];           // directory of development maps
+char    wadfile[1024]; // primary wad file
+char    mapdir[1024]; // directory of development maps
 
 
-void D_CheckNetGame (void);
-void D_ProcessEvents (void);
-void G_BuildTiccmd (ticcmd_t* cmd);
-void D_DoAdvanceDemo (void);
+void D_CheckNetGame(void);
+void D_ProcessEvents(void);
+void G_BuildTiccmd(ticcmd_t* cmd);
+void D_DoAdvanceDemo(void);
 
 
 //
@@ -148,18 +148,18 @@ void D_DoAdvanceDemo (void);
 // Events can be discarded if no responder claims them
 //
 
-#define MAXEVENTS		64
+#define MAXEVENTS    64
 
-static event_t         events[MAXEVENTS];
-static int             eventhead;
-static int 		eventtail;
+static event_t    events[MAXEVENTS];
+static int32_t    eventhead;
+static int32_t    eventtail;
 
 
 //
 // D_PostEvent
 // Called by the I/O functions when input is detected
 //
-void D_PostEvent (event_t* ev)
+void D_PostEvent(event_t* ev)
 {
     events[eventhead] = *ev;
     eventhead = (eventhead + 1) % MAXEVENTS;

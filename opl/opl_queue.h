@@ -39,7 +39,7 @@ void OPL_Queue_Push(opl_callback_queue_t *queue,
                     unsigned int time);
 int OPL_Queue_Pop(opl_callback_queue_t *queue,
                   opl_callback_t *callback, void **data);
-unsigned int OPL_Queue_Peek(opl_callback_queue_t *queue);
+uint32_t OPL_Queue_Peek(opl_callback_queue_t *queue);
 
 #endif /* #ifndef OPL_QUEUE_H */
 
