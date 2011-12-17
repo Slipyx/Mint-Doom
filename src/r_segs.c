@@ -624,11 +624,14 @@ R_StoreWallRange
     if (segtextured)
     {
 	offsetangle = rw_normalangle-rw_angle1;
-	
-	if (offsetangle > ANG180)
-	    offsetangle = -offsetangle;
 
-	if (offsetangle > ANG90)
+    if (offsetangle > ANG180)
+    {
+        // JoshK: Not sure if same as -offsetangle
+        offsetangle = ~offsetangle + 1;
+    }
+
+    if (offsetangle > ANG90)
 	    offsetangle = ANG90;
 
 	sineval = finesine[offsetangle >>ANGLETOFINESHIFT];

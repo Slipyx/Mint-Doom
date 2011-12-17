@@ -300,7 +300,7 @@ void R_AddLine(seg_t* line)
         {
             return;
         }
-        angle2 = -clipangle;
+        angle2 = ~clipangle + 1; // JoshK: Not sure if same as -clipangle
     }
 
     // The seg is in the view range,
@@ -480,7 +480,7 @@ boolean R_CheckBBox(fixed_t* bspcoord)
             return false;
         }
 
-        angle2 = -clipangle;
+        angle2 = ~clipangle + 1; // JoshK: Not sure if same as -clipangle
     }
 
 

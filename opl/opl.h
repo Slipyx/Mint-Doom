@@ -27,6 +27,7 @@
 #ifndef OPL_OPL_H
 #define OPL_OPL_H
 
+// JoshK: For using [u]intN_t throughout opl files.
 #include <inttypes.h>
 
 typedef void (*opl_callback_t)(void *data);
