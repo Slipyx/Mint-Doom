@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!-- Magic manifest file that should make Windows Vista/7 not
-     attempt to gain elevated privileges for chocolate-setup.
+     attempt to gain elevated privileges for mint-setup.
      
      Based on:
      

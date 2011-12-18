@@ -12,11 +12,11 @@ FILETYPE 1
   BLOCK "040904E4"
   {
    VALUE "FileVersion", "1.6.0"
-   VALUE "FileDescription", "Chocolate-Doom Setup"
-   VALUE "InternalName", "chocolate-setup"
-   VALUE "CompanyName", "fraggle@gmail.com"
+   VALUE "FileDescription", "Mint-Doom Setup"
+   VALUE "InternalName", "mint-setup"
+   VALUE "CompanyName", "jdk1337@gmail.com"
    VALUE "LegalCopyright", "GNU General Public License"
-   VALUE "ProductName", "Chocolate-Doom Setup"
+   VALUE "ProductName", "Mint-Doom Setup"
    VALUE "ProductVersion", "1.6.0"
   }
  }

@@ -427,8 +427,8 @@ int DEH_LoadLumpByName(char *name)
 
 void DEH_Init(void)
 {
-    char *filename;
-    int p;
+    char        *filename;
+    uint32_t    p;
 
     InitializeSections();
 
@@ -438,9 +438,9 @@ void DEH_Init(void)
     // Ignore cheats in dehacked files.
     //
 
-    if (M_CheckParm("-nocheats") > 0) 
+    if (M_CheckParm("-nocheats") > 0)
     {
-	deh_apply_cheats = false;
+        deh_apply_cheats = false;
     }
 
     //!
@@ -464,4 +464,3 @@ void DEH_Init(void)
         }
     }
 }
-

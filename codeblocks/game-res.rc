@@ -11,10 +11,10 @@ FILETYPE 1
   {
    VALUE "FileVersion", "1.6.0"
    VALUE "FileDescription", "1.6.0"
-   VALUE "InternalName", "Chocolate-Doom"
-   VALUE "CompanyName", "Chocolate-Doom"
+   VALUE "InternalName", "Mint-Doom"
+   VALUE "CompanyName", "Mint-Doom"
    VALUE "LegalCopyright", "GNU General Public License"
-   VALUE "ProductName", "Chocolate-Doom"
+   VALUE "ProductName", "Mint-Doom"
    VALUE "ProductVersion", "1.6.0"
   }
  }

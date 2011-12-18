@@ -443,13 +443,13 @@ static unsigned char mem_dump_custom[DOS_MEM_DUMP_SIZE];
 
 static const unsigned char *dos_mem_dump = mem_dump_dos622;
 
-boolean I_GetMemoryValue(unsigned int offset, void *value, int size)
+boolean I_GetMemoryValue(uint32_t offset, void *value, int32_t size)
 {
-    static boolean firsttime = true;
+    static boolean    firsttime = true;
 
     if (firsttime)
     {
-        int p, i, val;
+        uint32_t    p, i, val;
 
         firsttime = false;
         i = 0;
@@ -481,7 +481,7 @@ boolean I_GetMemoryValue(unsigned int offset, void *value, int size)
             }
             else
             {
-                for (i = 0; i < DOS_MEM_DUMP_SIZE; ++i)
+                for (i=0; i<DOS_MEM_DUMP_SIZE; ++i)
                 {
                     ++p;
 
@@ -491,7 +491,7 @@ boolean I_GetMemoryValue(unsigned int offset, void *value, int size)
                     }
 
                     M_StrToInt(myargv[p], &val);
-                    mem_dump_custom[i++] = (unsigned char) val;
+                    mem_dump_custom[i++] = (unsigned char)val;
                 }
 
                 dos_mem_dump = mem_dump_custom;
@@ -501,21 +501,22 @@ boolean I_GetMemoryValue(unsigned int offset, void *value, int size)
 
     switch (size)
     {
-    case 1:
-        *((unsigned char *) value) = dos_mem_dump[offset];
-        return true;
-    case 2:
-        *((unsigned short *) value) = dos_mem_dump[offset]
-                                    | (dos_mem_dump[offset + 1] << 8);
-        return true;
-    case 4:
-        *((unsigned int *) value) = dos_mem_dump[offset]
-                                  | (dos_mem_dump[offset + 1] << 8)
-                                  | (dos_mem_dump[offset + 2] << 16)
-                                  | (dos_mem_dump[offset + 3] << 24);
-        return true;
+        case 1:
+            *((unsigned char *)value) = dos_mem_dump[offset];
+            return true;
+
+        case 2:
+            *((uint16_t *)value) = dos_mem_dump[offset]
+                                 | (dos_mem_dump[offset + 1] << 8);
+            return true;
+
+        case 4:
+            *((uint32_t *)value) = dos_mem_dump[offset]
+                                 | (dos_mem_dump[offset + 1] << 8)
+                                 | (dos_mem_dump[offset + 2] << 16)
+                                 | (dos_mem_dump[offset + 3] << 24);
+            return true;
     }
 
     return false;
 }
-

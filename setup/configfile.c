@@ -81,14 +81,14 @@ void M_MakeDirectory(char *path)
 // M_SetConfigDir:
 //
 // Sets the location of the configuration directory, where configuration
-// files are stored - default.cfg, chocolate-doom.cfg, savegames, etc.
+// files are stored - default.cfg, mint-doom.cfg, savegames, etc.
 //
 
 void M_SetConfigDir(void)
 {
 #if !defined(_WIN32) || defined(_WIN32_WCE)
 
-    // Configuration settings are stored in ~/.chocolate-doom/,
+    // Configuration settings are stored in ~/.mint-doom/,
     // except on Windows, where we behave like Vanilla Doom and
     // save in the current directory.
 
@@ -146,7 +146,7 @@ static int detailLevel = 0;
 static int usegamma = 0;
 
 // dos specific options: these are unused but should be maintained
-// so that the config file can be shared between chocolate
+// so that the config file can be shared between mint
 // doom and doom.exe
 
 static int snd_sbport = 0;
@@ -669,7 +669,7 @@ void M_SaveMainDefaults(char *filename)
 }
 
 // 
-// Save extra (chocolate-doom.cfg) defaults to a given file
+// Save extra (mint-doom.cfg) defaults to a given file
 // 
 
 void M_SaveExtraDefaults(char *filename)

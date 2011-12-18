@@ -23,7 +23,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -36,7 +35,6 @@
 uint32_t    myargc;
 char        **myargv;
 
-
 //
 // M_CheckParm
 // Checks for the given parameter
@@ -48,7 +46,7 @@ uint32_t M_CheckParmWithArgs(char *check, uint32_t num_args)
 {
     uint32_t    i;
 
-    for (i=1; i<myargc-num_args; i++)
+    for (i=1; i<myargc - num_args; i++)
     {
         if (!strcasecmp(check, myargv[i]))
         {
@@ -187,7 +185,7 @@ static void LoadResponseFile(uint32_t argv_index)
 
     // Add arguments following the response file argument
 
-    for (i=argv_index+1; i<myargc; ++i)
+    for (i=argv_index + 1; i<myargc; ++i)
     {
         newargv[newargc] = myargv[i];
         ++newargc;
@@ -212,7 +210,6 @@ static void LoadResponseFile(uint32_t argv_index)
 //
 // Find a Response File
 //
-
 void M_FindResponseFile(void)
 {
     uint32_t    i;
