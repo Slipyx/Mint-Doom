@@ -46,7 +46,7 @@ char        **myargv;
 //
 uint32_t M_CheckParmWithArgs(char *check, uint32_t num_args)
 {
-    uint32_t i;
+    uint32_t    i;
 
     for (i=1; i<myargc-num_args; i++)
     {
@@ -215,7 +215,7 @@ static void LoadResponseFile(uint32_t argv_index)
 
 void M_FindResponseFile(void)
 {
-    uint32_t i;
+    uint32_t    i;
 
     for (i=1; i<myargc; i++)
     {
