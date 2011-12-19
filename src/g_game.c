@@ -149,7 +149,7 @@ boolean    testcontrols = false;    // Invoked by setup to test controls
 
 wbstartstruct_t    wminfo;    // parms for world map / intermission
 
-byte    consistancy[MAXPLAYERS][BACKUPTICS];
+byte    consistency[MAXPLAYERS][BACKUPTICS];
 
 //
 // Controls
@@ -507,7 +507,7 @@ void G_BuildTiccmd(ticcmd_t *cmd)
 
     memset(cmd, 0, sizeof(ticcmd_t));
 
-    cmd->consistancy = consistancy[consoleplayer][maketic % BACKUPTICS];
+    cmd->consistency = consistency[consoleplayer][maketic % BACKUPTICS];
  
     strafe = gamekeydown[key_strafe] || mousebuttons[mousebstrafe]
           || joybuttons[joybstrafe];
@@ -1114,8 +1114,8 @@ void G_Ticker(void)
         }
     }
 
-    // get commands, check consistancy,
-    // and build new consistancy check
+    // get commands, check consistency,
+    // and build new consistency check
     buf = (gametic / ticdup) % BACKUPTICS;
 
     for (i=0; i<MAXPLAYERS; i++)
@@ -1161,18 +1161,18 @@ void G_Ticker(void)
             if (netgame && !netdemo && !(gametic % ticdup))
             {
                 if (gametic > BACKUPTICS
-                 && consistancy[i][buf] != cmd->consistancy)
+                 && consistency[i][buf] != cmd->consistency)
                 {
                     I_Error("consistency failure (%i should be %i)",
-                            cmd->consistancy, consistancy[i][buf]);
+                            cmd->consistency, consistency[i][buf]);
                 }
                 if (players[i].mo)
                 {
-                    consistancy[i][buf] = players[i].mo->x;
+                    consistency[i][buf] = players[i].mo->x;
                 }
                 else
                 {
-                    consistancy[i][buf] = rndindex;
+                    consistency[i][buf] = rndindex;
                 }
             }
         }

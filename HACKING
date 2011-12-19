@@ -2,29 +2,28 @@
 Coding style guidelines
 =======================
 
-The coding style guidelines for Chocolate Doom are designed to keep the
-style of the original source code.  This maintains consistency throughout
-the program, and does not require the original code to be changed. Some
-of these guidelines are stricter than what was done in the original
-source; follow these when writing new code only: there is no need to 
-change existing code to fit them.
+The coding style guidelines for Mint Doom are partially designed to keep the
+style of the original source code. This maintains some consistency throughout
+the program, and does not require all the original code to be changed. Some
+of these guidelines are stricter than what was done in the original source;
+follow these when writing new code and when changing existing code to fit them.
 
-You should set tabs to _display_ as eight spaces, not four.  However, 
-_indentation_ should be four spaces.  If possible, do not use tab
-characters at all.  There is a utility called "expand" which will remove
-tab characters.  For the reasoning behind this, see:
-http://www.jwz.org/doc/tabs-vs-spaces.html
+Do not use tab characters. If there is a tab character, it should be replaced
+by four spaces as soon as possible. Indentation should be four spaces. Some
+text editors have an option to replace all tab characters with spaces. There is
+also a utility called "expand" which will remove tab characters. For the
+reasoning behind this, see: http://www.jwz.org/doc/tabs-vs-spaces.html
 
-Please write code to an 80 column limit so that it fits within a standard
-80 column terminal.
+Please write code to an 80 column limit if possible so that it fits within a
+standard 80 column terminal.
 
-Functions should be named like this: 'AB_FunctionName'.  The 'AB' prefix 
+Functions should be named like this: 'AB_FunctionName'.  The 'AB' prefix
 denotes the subsystem (AM_ for automap, G_ for game, etc).  If a
 function is static, you can omit the prefix and just name it like
-'FunctionName'.  Functions and global variables should always be made 
+'FunctionName'.  Functions and global variables should always be made
 static if possible.
 
-Put '_t' on the end of types created with typedef.  Type names like this
+Put '_t' on the end of types created with typedef. Type names like this
 should be all lowercase and have the subsystem name at the start. An
 example of this is 'txt_window_t'.  When creating structures, always
 typedef them.
@@ -37,8 +36,19 @@ Use C++-style comments, ie. '//' comments, not '/* ... */' comments.
 I don't care that this isn't standard ANSI C.
 
 Variables should be named like this: 'my_variable_name', not like this:
-'MyVariableName'.  In pointer variable declarations, place the '*' next 
-to the variable name, not the type.
+'MyVariableName'. In pointer variable declarations, place the '*' next 
+to the variable name, not the type. In function prototypes and definitions,
+place the '*' with a space between the type and function name for functions
+returning pointers, and next to the variable name in the argument list.
+
+Variable declarations and definitions should have four spaces between the
+type and name.
+
+Functions should not have a space between the name and the opening
+parenthesis. A single space should be after each comma separating the
+parameters. This goes for prototypes, definitions and calls.
+
+There should be no trailing spaces at the end of a line.
 
 When using an if, do, while, or for statement, always use the { } braces
 even when they are not necessary.  For example, do this:
@@ -61,7 +71,7 @@ typedef struct
     char *member2;
 } my_structure_t;
 
-void FunctionName(int argument, int arg2, int arg3, int arg4, int arg5, 
+void FunctionName(int argument, int arg2, int arg3, int arg4, int arg5,
                   int arg6, int arg7)
 {
     if (condition)
@@ -113,18 +123,23 @@ void FunctionName(int argument, int arg2, int arg3, int arg4, int arg5,
     } while (condition);
 }
 
+For more examples, just look at a source file that has already been changed
+to follow the new guidelines. g_game.c, d_main.c, and r_bsp.c should be good
+enough.
+
 Portability
 ===========
 
 Chocolate Doom is designed to be cross-platform and work on different
-Operating Systems and processors.  Bear this in mind when writing code.
+Operating Systems and processors. Bear this in mind when writing code.
 
-Do not use the long type (its size differs across platforms; use 
+Do not use the long type (its size differs across platforms; use
 int or int64_t depending on which you want).
 
 Use Doom's byte data type for byte data. 'int' is assumed to be a
-32-bit integer, and 'short' is a 16-bit integer. You can also use the
-ISO C99 data types: intN_t and uintN_t where N is 8,16,32,64.
+32-bit integer, and 'short' is a 16-bit integer. One of the main goals of
+Mint Doom is replacing all the int types with the corresponding ISO C99 data
+types: intN_t and uintN_t where N is 8,16,32,64; so use these instead.
 
 Be careful with platform dependencies: do not use Windows API 
 functions, for example.  Use SDL where possible.
@@ -173,4 +188,3 @@ this template:
 // 02111-1307, USA.
 
 # vim: tw=70
-

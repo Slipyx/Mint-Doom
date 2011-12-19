@@ -20,16 +20,14 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//	System specific interface stuff.
+//    System specific interface stuff.
 //
 //-----------------------------------------------------------------------------
-
 
 #ifndef __D_TICCMD__
 #define __D_TICCMD__
 
 #include "doomtype.h"
-
 
 // The data sampled per tick (single player)
 // and transmitted to other peers (multiplayer).
@@ -37,14 +35,12 @@
 // plus a checksum for internal state consistency.
 typedef struct
 {
-    signed char	forwardmove;	// *2048 for move
-    signed char	sidemove;	// *2048 for move
-    short	angleturn;	// <<16 for angle delta
-    byte	chatchar;
-    byte	buttons;
-    byte        consistancy;	// checks for net game
+    int8_t     forwardmove;  // *2048 for move
+    int8_t     sidemove;     // *2048 for move
+    int16_t    angleturn;    // <<16 for angle delta
+    byte       chatchar;
+    byte       buttons;
+    byte       consistency;    // checks for net game
 } ticcmd_t;
-
-
 
 #endif
