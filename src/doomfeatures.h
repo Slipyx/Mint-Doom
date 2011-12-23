@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 2005 Simon Howard
@@ -29,20 +29,18 @@
 
 // Enables wad merging (the '-merge' command line parameter)
 
-#define FEATURE_WAD_MERGE 1
+#define FEATURE_WAD_MERGE      1
 
 // Enables dehacked support ('-deh')
 
-#define FEATURE_DEHACKED 1
+#define FEATURE_DEHACKED       1
 
 // Enables multiplayer support (network games)
 
-#define FEATURE_MULTIPLAYER 1
+#define FEATURE_MULTIPLAYER    1
 
 // Enables sound output
 
-#define FEATURE_SOUND 1
+#define FEATURE_SOUND          1
 
-#endif /* #ifndef DOOM_FEATURES_H */
-
-
+#endif    // DOOM_FEATURES_H

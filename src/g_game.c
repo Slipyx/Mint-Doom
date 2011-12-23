@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include "doomdef.h" 
+#include "doomdef.h"
 #include "doomstat.h"
 
 #include "deh_main.h"
@@ -59,7 +59,7 @@
 
 #include "w_wad.h"
 
-#include "p_local.h" 
+#include "p_local.h"
 
 #include "s_sound.h"
 
@@ -193,7 +193,7 @@ int32_t    mousebuse = -1;
 int32_t    mousebprevweapon = -1;
 int32_t    mousebnextweapon = -1;
 
-// Control whether if a mouse button is double clicked, it acts like 
+// Control whether if a mouse button is double clicked, it acts like
 // "use" has been pressed
 
 int32_t    dclick_use = 1;
@@ -241,8 +241,8 @@ static int32_t    next_weapon = 0;
 
 static const struct
 {
-    weapontype_t weapon;
-    weapontype_t weapon_num;
+    weapontype_t    weapon;
+    weapontype_t    weapon_num;
 } weapon_order_table[] = {
     {wp_fist,            wp_fist},
     {wp_chainsaw,        wp_fist},
@@ -373,7 +373,7 @@ void G_DrawMouseSpeedBox(void)
 
     linelen = (original_speed * redline_x) / mouse_threshold;
 
-    // Draw horizontal "thermometer" 
+    // Draw horizontal "thermometer"
 
     for (x=0; x<(MOUSE_SPEED_BOX_WIDTH - 1) * 8; ++x)
     {
@@ -508,7 +508,7 @@ void G_BuildTiccmd(ticcmd_t *cmd)
     memset(cmd, 0, sizeof(ticcmd_t));
 
     cmd->consistency = consistency[consoleplayer][maketic % BACKUPTICS];
- 
+
     strafe = gamekeydown[key_strafe] || mousebuttons[mousebstrafe]
           || joybuttons[joybstrafe];
 
@@ -730,7 +730,7 @@ void G_BuildTiccmd(ticcmd_t *cmd)
     }
 
     // fraggle: allow disabling mouse y movement
- 
+
     if (!novert)
     {
         forward += mousey;
@@ -1827,7 +1827,7 @@ void G_DoSaveGame(void)
     savegame_error = false;
 
     P_WriteSaveGameHeader(savedescription);
- 
+
     P_ArchivePlayers();
     P_ArchiveWorld();
     P_ArchiveThinkers();
@@ -2259,7 +2259,7 @@ void G_DeferedPlayDemo(char *name)
 
 // Generate a string describing a demo version
 
-static char * DemoVersionDescription(int32_t version)
+static char *DemoVersionDescription(int32_t version)
 {
     static char resultbuf[16];
 

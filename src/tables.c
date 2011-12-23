@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -22,7 +22,7 @@
 // DESCRIPTION:
 //    Lookup tables.
 //    Do not try to look them up :-).
-//    In the order of appearance: 
+//    In the order of appearance:
 //
 //    int finetangent[4096]    - Tangens LUT.
 //     Should work with BAM fairly well (12 of 16bit,
@@ -30,12 +30,12 @@
 //
 //    int finesine[10240]        - Sine lookup.
 //     Guess what, serves as cosine, too.
-//     Remarkable thing is, how to use BAMs with this? 
+//     Remarkable thing is, how to use BAMs with this?
 //
 //    int tantoangle[2049]    - ArcTan LUT,
 //      maps tan(angle) to angle fast. Gotta search.
-//    
-//    
+//
+//
 //-----------------------------------------------------------------------------
 
 #include "tables.h"
@@ -569,7 +569,6 @@ const int32_t    finetangent[4096] =
     5512368,5892567,6329090,6835455,7429880,8137527,8994149,10052327,
     11392683,13145455,15535599,18988036,24413316,34178904,56965752,170910304
 };
-
 
 const int32_t    finesine[10240] =
 {
@@ -1854,7 +1853,6 @@ const int32_t    finesine[10240] =
     65531,65531,65532,65532,65533,65533,65534,65534,
     65534,65535,65535,65535,65535,65535,65535,65535
 };
-
 
 const angle_t    tantoangle[2049] =
 {

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -158,7 +158,7 @@ void D_PostEvent(event_t *ev)
 
 // Read an event from the queue.
 
-event_t * D_PopEvent(void)
+event_t *D_PopEvent(void)
 {
     event_t    *result;
 
@@ -684,9 +684,9 @@ void PrintDehackedBanners(void)
 
 static struct
 {
-    char *description;
-    char *cmdline;
-    GameVersion_t version;
+    char             *description;
+    char             *cmdline;
+    GameVersion_t    version;
 } gameversions[] = {
     {"Doom 1.9",            "1.9",         exe_doom_1_9},
     {"Hacx",                "hacx",        exe_hacx},
@@ -997,7 +997,7 @@ void D_DoomMain(void)
 
     fastparm = M_CheckParm("-fast");
 
-    //! 
+    //!
     // @vanilla
     //
     // Developer mode.  F1 saves a screenshot in the current working

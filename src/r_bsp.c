@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -64,10 +64,10 @@ void R_ClearDrawSegs(void)
 // Clips the given range of columns
 // and includes it in the new clip list.
 //
-typedef    struct
+typedef struct
 {
-    int32_t first;
-    int32_t last;
+    int32_t    first;
+    int32_t    last;
 } cliprange_t;
 
 #define MAXSEGS    32
@@ -84,8 +84,8 @@ cliprange_t    solidsegs[MAXSEGS];
 //
 void R_ClipSolidWallSegment(int32_t first, int32_t last)
 {
-    cliprange_t*    next;
-    cliprange_t*    start;
+    cliprange_t    *next;
+    cliprange_t    *start;
 
     // Find the first range that touches the range
     //  (adjacent pixels are touching).

@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -24,12 +24,10 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #ifndef __D_MAIN__
 #define __D_MAIN__
 
 #include "d_event.h"
-
 
 //
 // D_DoomMain()
@@ -50,7 +48,6 @@ event_t *D_PopEvent(void);
 
 void D_ProcessEvents(void);
 
-
 //
 // BASE LEVEL
 //
@@ -59,6 +56,5 @@ void D_PageDrawer(void);
 void D_AdvanceDemo(void);
 void D_DoAdvanceDemo(void);
 void D_StartTitle(void);
-
 
 #endif

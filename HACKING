@@ -38,8 +38,8 @@ I don't care that this isn't standard ANSI C.
 Variables should be named like this: 'my_variable_name', not like this:
 'MyVariableName'. In pointer variable declarations, place the '*' next 
 to the variable name, not the type. In function prototypes and definitions,
-place the '*' with a space between the type and function name for functions
-returning pointers, and next to the variable name in the argument list.
+place the '*' next to the function name for functions returning pointers, and
+next to the variable name in the argument list.
 
 Variable declarations and definitions should have four spaces between the
 type and name.
