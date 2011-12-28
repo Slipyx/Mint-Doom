@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 2006 Simon Howard
@@ -23,7 +23,6 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #ifndef __D_IWAD__
 #define __D_IWAD__
 
@@ -36,4 +35,3 @@ void D_SetGameDescription(void);
 void D_FindInstalledIWADs(void);
 
 #endif
-

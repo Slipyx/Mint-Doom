@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -20,10 +20,9 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//	DOOM graphics stuff for SDL.
+//    DOOM graphics stuff for SDL.
 //
 //-----------------------------------------------------------------------------
-
 
 #include "SDL.h"
 #include <stdlib.h>
@@ -50,12 +49,13 @@
 #include "w_wad.h"
 #include "z_zone.h"
 
-#define LOADING_DISK_W 16
-#define LOADING_DISK_H 16
+#define LOADING_DISK_W    16
+#define LOADING_DISK_H    16
 
 // Non aspect ratio-corrected modes (direct multiples of 320x200)
 
-static screen_mode_t *screen_modes[] = {
+static screen_mode_t    *screen_modes[] =
+{
     &mode_scale_1x,
     &mode_scale_2x,
     &mode_scale_3x,
@@ -65,7 +65,8 @@ static screen_mode_t *screen_modes[] = {
 
 // Aspect ratio corrected modes (4:3 ratio)
 
-static screen_mode_t *screen_modes_corrected[] = {
+static screen_mode_t    *screen_modes_corrected[] =
+{
 
     // Vertically stretched modes (320x200 -> 320x240 and multiples)
 
@@ -85,104 +86,104 @@ static screen_mode_t *screen_modes_corrected[] = {
 };
 
 extern void M_QuitDOOM();
-extern boolean advancedemo;
+extern boolean    advancedemo;
 
 // SDL video driver name
 
-char *video_driver = "";
+char    *video_driver = "";
 
-static SDL_Surface *screen;
+static SDL_Surface    *screen;
 
 // Intermediate 8-bit buffer that we draw to instead of 'screen'.
 // This is used when we are rendering in 32-bit screen mode.
 // When in a real 8-bit screen mode, screenbuffer == screen.
 
-static SDL_Surface *screenbuffer = NULL;
+static SDL_Surface    *screenbuffer = NULL;
 
 // palette
 
-static SDL_Color palette[256];
-static boolean palette_to_set;
+static SDL_Color    palette[256];
+static boolean      palette_to_set;
 
 // display has been set up?
 
-static boolean initialized = false;
+static boolean    initialized = false;
 
 // disable mouse?
 
-static boolean nomouse = false;
-extern int usemouse;
+static boolean    nomouse = false;
+extern int32_t    usemouse;
 
 // Bit mask of mouse button state.
 
-static unsigned int mouse_button_state = 0;
+static uint32_t    mouse_button_state = 0;
 
 // if true, screens[0] is screen->pixel
 
-static boolean native_surface;
+static boolean    native_surface;
 
 // Screen width and height, from configuration file.
 
-int screen_width = SCREENWIDTH;
-int screen_height = SCREENHEIGHT;
+int32_t    screen_width = SCREENWIDTH;
+int32_t    screen_height = SCREENHEIGHT;
 
 // Color depth.
 
-int screen_bpp = 8;
+int32_t    screen_bpp = 8;
 
-// Automatically adjust video settings if the selected mode is 
+// Automatically adjust video settings if the selected mode is
 // not a valid video mode.
 
-int autoadjust_video_settings = 1;
+int32_t    autoadjust_video_settings = 1;
 
 // Run in full screen mode?  (int type for config code)
 
-int fullscreen = true;
+int32_t    fullscreen = true;
 
 // Aspect ratio correction mode
 
-int aspect_ratio_correct = true;
+int32_t    aspect_ratio_correct = true;
 
 // Time to wait for the screen to settle on startup before starting the
 // game (ms)
 
-int startup_delay = 1000;
+int32_t    startup_delay = 1000;
 
 // Grab the mouse? (int type for config code)
 
-int grabmouse = true;
+int32_t    grabmouse = true;
 
 // Flag indicating whether the screen is currently visible:
 // when the screen isnt visible, don't render the screen
 
-boolean screenvisible;
+boolean    screenvisible;
 
 // disk image data and background overwritten by the disk to be
 // restored by EndRead
 
-static byte *disk_image = NULL;
-static byte *saved_background;
-static boolean window_focused;
+static byte       *disk_image = NULL;
+static byte       *saved_background;
+static boolean    window_focused;
 
 // Empty mouse cursor
 
-static SDL_Cursor *cursors[2];
+static SDL_Cursor    *cursors[2];
 
 // The screen mode and scale functions being used
 
-static screen_mode_t *screen_mode;
+static screen_mode_t    *screen_mode;
 
 // Window resize state.
 
-static boolean need_resize = false;
-static unsigned int resize_w, resize_h;
-static unsigned int last_resize_time;
+static boolean     need_resize = false;
+static uint32_t    resize_w, resize_h;
+static uint32_t    last_resize_time;
 
 // If true, keyboard mapping is ignored, like in Vanilla Doom.
 // The sensible thing to do is to disable this if you have a non-US
 // keyboard.
 
-int vanilla_keyboard_mapping = true;
+int32_t    vanilla_keyboard_mapping = true;
 
 // Mouse acceleration
 //
@@ -193,28 +194,34 @@ int vanilla_keyboard_mapping = true;
 // the values exceed the value of mouse_threshold, they are multiplied
 // by mouse_acceleration to increase the speed.
 
-float mouse_acceleration = 2.0;
-int mouse_threshold = 10;
+float      mouse_acceleration = 2.0f;
+int32_t    mouse_threshold = 10;
 
-static void ApplyWindowResize(unsigned int w, unsigned int h);
+static void ApplyWindowResize(uint32_t w, uint32_t h);
 
 static boolean MouseShouldBeGrabbed()
 {
     // never grab the mouse when in screensaver mode
-   
+
     if (screensaver_mode)
+    {
         return false;
+    }
 
     // if the window doesn't have focus, never grab it
 
     if (!window_focused)
+    {
         return false;
+    }
 
-    // always grab the mouse when full screen (dont want to 
+    // always grab the mouse when full screen (dont want to
     // see the mouse pointer)
 
     if (fullscreen)
+    {
         return true;
+    }
 
 #ifdef _WIN32_WCE
 
@@ -230,22 +237,30 @@ static boolean MouseShouldBeGrabbed()
     // Don't grab the mouse if mouse input is disabled
 
     if (!usemouse || nomouse)
+    {
         return false;
+    }
 
     // Drone players don't need mouse focus
 
     if (drone)
+    {
         return false;
+    }
 
     // if we specify not to grab the mouse, never grab
 
     if (!grabmouse)
+    {
         return false;
+    }
 
-    // when menu is active or game is paused, release the mouse 
+    // when menu is active or game is paused, release the mouse
 
     if (menuactive || paused)
+    {
         return false;
+    }
 
     // only grab mouse when playing levels (but not demos)
 
@@ -262,11 +277,11 @@ static boolean MouseShouldBeGrabbed()
 
 static void UpdateFocus(void)
 {
-    Uint8 state;
+    Uint8    state;
 
     state = SDL_GetAppState();
 
-    // We should have input (keyboard) focus and be visible 
+    // We should have input (keyboard) focus and be visible
     // (not minimized)
 
     window_focused = (state & SDL_APPINPUTFOCUS) && (state & SDL_APPACTIVE);
@@ -278,18 +293,18 @@ static void UpdateFocus(void)
 
 static void LoadDiskImage(void)
 {
-    patch_t *disk;
-    char *disk_name;
-    int y;
-    int xoffset = SCREENWIDTH - LOADING_DISK_W;
-    int yoffset = SCREENHEIGHT - LOADING_DISK_H;
-    char buf[20];
+    patch_t    *disk;
+    char       *disk_name;
+    int32_t    y;
+    int32_t    xoffset = SCREENWIDTH - LOADING_DISK_W;
+    int32_t    yoffset = SCREENHEIGHT - LOADING_DISK_H;
+    char       buf[20];
 
     SDL_VideoDriverName(buf, 15);
 
     if (!strcmp(buf, "Quartz"))
     {
-        // MacOS Quartz gives us pageflipped graphics that screw up the 
+        // MacOS Quartz gives us pageflipped graphics that screw up the
         // display when we use the loading disk.  Disable it.
         // This is a gross hack.
 
@@ -297,9 +312,13 @@ static void LoadDiskImage(void)
     }
 
     if (M_CheckParm("-cdrom") > 0)
+    {
         disk_name = DEH_String("STCDROM");
+    }
     else
+    {
         disk_name = DEH_String("STDISK");
+    }
 
     disk = W_CacheLumpName(disk_name, PU_STATIC);
 
@@ -312,7 +331,7 @@ static void LoadDiskImage(void)
     disk_image = Z_Malloc(LOADING_DISK_W * LOADING_DISK_H, PU_STATIC, NULL);
     saved_background = Z_Malloc(LOADING_DISK_W * LOADING_DISK_H, PU_STATIC, NULL);
 
-    for (y=0; y<LOADING_DISK_H; ++y) 
+    for (y=0; y<LOADING_DISK_H; ++y)
     {
         memcpy(disk_image + LOADING_DISK_W * y,
                screens[0] + SCREENWIDTH * (y + yoffset) + xoffset,
@@ -326,96 +345,194 @@ static void LoadDiskImage(void)
 // Translates the SDL key
 //
 
-static int TranslateKey(SDL_keysym *sym)
+static int32_t TranslateKey(SDL_keysym *sym)
 {
     switch(sym->sym)
     {
-      case SDLK_LEFT:	return KEY_LEFTARROW;
-      case SDLK_RIGHT:	return KEY_RIGHTARROW;
-      case SDLK_DOWN:	return KEY_DOWNARROW;
-      case SDLK_UP:	return KEY_UPARROW;
-      case SDLK_ESCAPE:	return KEY_ESCAPE;
-      case SDLK_RETURN:	return KEY_ENTER;
-      case SDLK_TAB:	return KEY_TAB;
-      case SDLK_F1:	return KEY_F1;
-      case SDLK_F2:	return KEY_F2;
-      case SDLK_F3:	return KEY_F3;
-      case SDLK_F4:	return KEY_F4;
-      case SDLK_F5:	return KEY_F5;
-      case SDLK_F6:	return KEY_F6;
-      case SDLK_F7:	return KEY_F7;
-      case SDLK_F8:	return KEY_F8;
-      case SDLK_F9:	return KEY_F9;
-      case SDLK_F10:	return KEY_F10;
-      case SDLK_F11:	return KEY_F11;
-      case SDLK_F12:	return KEY_F12;
-	
-      case SDLK_BACKSPACE: return KEY_BACKSPACE;
-      case SDLK_DELETE:	return KEY_DEL;
+        case SDLK_LEFT:
+            return KEY_LEFTARROW;
 
-      case SDLK_PAUSE:	return KEY_PAUSE;
+        case SDLK_RIGHT:
+            return KEY_RIGHTARROW;
+
+        case SDLK_DOWN:
+            return KEY_DOWNARROW;
+
+        case SDLK_UP:
+            return KEY_UPARROW;
+
+        case SDLK_ESCAPE:
+            return KEY_ESCAPE;
+
+        case SDLK_RETURN:
+            return KEY_ENTER;
+
+        case SDLK_TAB:
+            return KEY_TAB;
+
+        case SDLK_F1:
+            return KEY_F1;
+
+        case SDLK_F2:
+            return KEY_F2;
+
+        case SDLK_F3:
+            return KEY_F3;
+
+        case SDLK_F4:
+            return KEY_F4;
+
+        case SDLK_F5:
+            return KEY_F5;
+
+        case SDLK_F6:
+            return KEY_F6;
+
+        case SDLK_F7:
+            return KEY_F7;
+
+        case SDLK_F8:
+            return KEY_F8;
+
+        case SDLK_F9:
+            return KEY_F9;
+
+        case SDLK_F10:
+            return KEY_F10;
+
+        case SDLK_F11:
+            return KEY_F11;
+
+        case SDLK_F12:
+            return KEY_F12;
+
+        case SDLK_BACKSPACE:
+            return KEY_BACKSPACE;
+
+        case SDLK_DELETE:
+            return KEY_DEL;
+
+        case SDLK_PAUSE:
+            return KEY_PAUSE;
 
 #if !SDL_VERSION_ATLEAST(1, 3, 0)
-      case SDLK_EQUALS: return KEY_EQUALS;
+        case SDLK_EQUALS:
+            return KEY_EQUALS;
 #endif
 
-      case SDLK_MINUS:          return KEY_MINUS;
+        case SDLK_MINUS:
+            return KEY_MINUS;
 
-      case SDLK_LSHIFT:
-      case SDLK_RSHIFT:
-	return KEY_RSHIFT;
-	
-      case SDLK_LCTRL:
-      case SDLK_RCTRL:
-	return KEY_RCTRL;
-	
-      case SDLK_LALT:
-      case SDLK_RALT:
+        case SDLK_LSHIFT:
+        case SDLK_RSHIFT:
+            return KEY_RSHIFT;
+
+        case SDLK_LCTRL:
+        case SDLK_RCTRL:
+            return KEY_RCTRL;
+
+        case SDLK_LALT:
+        case SDLK_RALT:
 #if !SDL_VERSION_ATLEAST(1, 3, 0)
-      case SDLK_LMETA:
-      case SDLK_RMETA:
+        case SDLK_LMETA:
+        case SDLK_RMETA:
 #endif
-        return KEY_RALT;
+            return KEY_RALT;
 
-      case SDLK_CAPSLOCK: return KEY_CAPSLOCK;
-      case SDLK_SCROLLOCK: return KEY_SCRLCK;
+        case SDLK_CAPSLOCK:
+            return KEY_CAPSLOCK;
 
-      case SDLK_KP0: return KEYP_0;
-      case SDLK_KP1: return KEYP_1;
-      case SDLK_KP2: return KEYP_2;
-      case SDLK_KP3: return KEYP_3;
-      case SDLK_KP4: return KEYP_4;
-      case SDLK_KP5: return KEYP_5;
-      case SDLK_KP6: return KEYP_6;
-      case SDLK_KP7: return KEYP_7;
-      case SDLK_KP8: return KEYP_8;
-      case SDLK_KP9: return KEYP_9;
+        case SDLK_SCROLLOCK:
+            return KEY_SCRLCK;
 
-      case SDLK_KP_PERIOD:   return KEYP_PERIOD;
-      case SDLK_KP_MULTIPLY: return KEYP_MULTIPLY;
-      case SDLK_KP_PLUS:     return KEYP_PLUS;
-      case SDLK_KP_MINUS:    return KEYP_MINUS;
-      case SDLK_KP_DIVIDE:   return KEYP_DIVIDE;
-      case SDLK_KP_EQUALS:   return KEYP_EQUALS;
-      case SDLK_KP_ENTER:    return KEYP_ENTER;
+        case SDLK_KP0:
+            return KEYP_0;
 
-      case SDLK_HOME: return KEY_HOME;
-      case SDLK_INSERT: return KEY_INS;
-      case SDLK_END: return KEY_END;
-      case SDLK_PAGEUP: return KEY_PGUP;
-      case SDLK_PAGEDOWN: return KEY_PGDN;
+        case SDLK_KP1:
+            return KEYP_1;
+
+        case SDLK_KP2:
+            return KEYP_2;
+
+        case SDLK_KP3:
+            return KEYP_3;
+
+        case SDLK_KP4:
+            return KEYP_4;
+
+        case SDLK_KP5:
+            return KEYP_5;
+
+        case SDLK_KP6:
+            return KEYP_6;
+
+        case SDLK_KP7:
+            return KEYP_7;
+
+        case SDLK_KP8:
+            return KEYP_8;
+
+        case SDLK_KP9:
+            return KEYP_9;
+
+        case SDLK_KP_PERIOD:
+            return KEYP_PERIOD;
+
+        case SDLK_KP_MULTIPLY:
+            return KEYP_MULTIPLY;
+
+        case SDLK_KP_PLUS:
+            return KEYP_PLUS;
+
+        case SDLK_KP_MINUS:
+            return KEYP_MINUS;
+
+        case SDLK_KP_DIVIDE:
+            return KEYP_DIVIDE;
+
+        case SDLK_KP_EQUALS:
+            return KEYP_EQUALS;
+
+        case SDLK_KP_ENTER:
+            return KEYP_ENTER;
+
+        case SDLK_HOME:
+            return KEY_HOME;
+
+        case SDLK_INSERT:
+            return KEY_INS;
+
+        case SDLK_END:
+            return KEY_END;
+
+        case SDLK_PAGEUP:
+            return KEY_PGUP;
+
+        case SDLK_PAGEDOWN:
+            return KEY_PGDN;
 
 #ifdef SDL_HAVE_APP_KEYS
-        case SDLK_APP1:        return KEY_F1;
-        case SDLK_APP2:        return KEY_F2;
-        case SDLK_APP3:        return KEY_F3;
-        case SDLK_APP4:        return KEY_F4;
-        case SDLK_APP5:        return KEY_F5;
-        case SDLK_APP6:        return KEY_F6;
+        case SDLK_APP1:
+            return KEY_F1;
+
+        case SDLK_APP2:
+            return KEY_F2;
+
+        case SDLK_APP3:
+            return KEY_F3;
+
+        case SDLK_APP4:
+            return KEY_F4;
+
+        case SDLK_APP5:
+            return KEY_F5;
+
+        case SDLK_APP6:
+            return KEY_F6;
 #endif
 
-      default:
-        return tolower(sym->sym);
+        default:
+            return tolower(sym->sym);
     }
 }
 
@@ -428,12 +545,10 @@ void I_ShutdownGraphics(void)
         SDL_WM_GrabInput(SDL_GRAB_OFF);
 
         SDL_QuitSubSystem(SDL_INIT_VIDEO);
-    
+
         initialized = false;
     }
 }
-
-
 
 //
 // I_StartFrame
@@ -444,9 +559,9 @@ void I_StartFrame (void)
 
 }
 
-static void UpdateMouseButtonState(unsigned int button, boolean on)
+static void UpdateMouseButtonState(uint32_t button, boolean on)
 {
-    event_t event;
+    event_t    event;
 
     if (button < SDL_BUTTON_LEFT || button > MAX_MOUSE_BUTTONS)
     {
@@ -496,14 +611,16 @@ static void UpdateMouseButtonState(unsigned int button, boolean on)
     D_PostEvent(&event);
 }
 
-static int AccelerateMouse(int val)
+static int32_t AccelerateMouse(int32_t val)
 {
     if (val < 0)
+    {
         return -AccelerateMouse(-val);
+    }
 
     if (val > mouse_threshold)
     {
-        return (int)((val - mouse_threshold) * mouse_acceleration + mouse_threshold);
+        return (int32_t)((val - mouse_threshold) * mouse_acceleration + mouse_threshold);
     }
     else
     {
@@ -513,20 +630,20 @@ static int AccelerateMouse(int val)
 
 void I_GetEvent(void)
 {
-    SDL_Event sdlevent;
-    event_t event;
+    SDL_Event    sdlevent;
+    event_t      event;
 
     // possibly not needed
-    
+
     SDL_PumpEvents();
 
     // put event-grabbing stuff in here
-    
+
     while (SDL_PollEvent(&sdlevent))
     {
         // ignore mouse events when the window is not focused
 
-        if (!window_focused 
+        if (!window_focused
          && (sdlevent.type == SDL_MOUSEMOTION
           || sdlevent.type == SDL_MOUSEBUTTONDOWN
           || sdlevent.type == SDL_MOUSEBUTTONUP))
@@ -540,7 +657,7 @@ void I_GetEvent(void)
         }
 
         // process event
-        
+
         switch (sdlevent.type)
         {
             case SDL_KEYDOWN:
@@ -552,9 +669,9 @@ void I_GetEvent(void)
                 // This does not change depending on keyboard layout.
                 // If you have a German keyboard, pressing 'z' will
                 // give 'y', for example.  It is desirable to be able
-                // to fix this so that people with non-standard 
+                // to fix this so that people with non-standard
                 // keyboard mappings can type properly.  If vanilla
-                // mode is disabled, use the properly translated 
+                // mode is disabled, use the properly translated
                 // version.
 
                 if (vanilla_keyboard_mapping)
@@ -582,7 +699,7 @@ void I_GetEvent(void)
                 }
                 break;
 
-                /*
+            /*
             case SDL_MOUSEMOTION:
                 event.type = ev_mouse;
                 event.data1 = mouse_button_state;
@@ -590,25 +707,25 @@ void I_GetEvent(void)
                 event.data3 = -AccelerateMouse(sdlevent.motion.yrel);
                 D_PostEvent(&event);
                 break;
-                */
+            */
 
             case SDL_MOUSEBUTTONDOWN:
-		if (usemouse && !nomouse)
-		{
+                if (usemouse && !nomouse)
+                {
                     UpdateMouseButtonState(sdlevent.button.button, true);
-		}
+                }
                 break;
 
             case SDL_MOUSEBUTTONUP:
-		if (usemouse && !nomouse)
-		{
+                if (usemouse && !nomouse)
+                {
                     UpdateMouseButtonState(sdlevent.button.button, false);
-		}
+                }
                 break;
 
             case SDL_QUIT:
                 // bring up the "quit doom?" prompt
-                S_StartSound(NULL,sfx_swtchn);
+                S_StartSound(NULL, sfx_swtchn);
                 M_QuitDOOM(0);
                 break;
 
@@ -657,11 +774,11 @@ static void CenterMouse(void)
 //
 // This is to combine all mouse movement for a tic into one mouse
 // motion event.
-
+//
 static void I_ReadMouse(void)
 {
-    int x, y;
-    event_t ev;
+    int32_t    x, y;
+    event_t    ev;
 
 #if SDL_VERSION_ATLEAST(1, 3, 0)
     SDL_GetRelativeMouseState(0, &x, &y);
@@ -669,13 +786,13 @@ static void I_ReadMouse(void)
     SDL_GetRelativeMouseState(&x, &y);
 #endif
 
-    if (x != 0 || y != 0) 
+    if (x != 0 || y != 0)
     {
         ev.type = ev_mouse;
         ev.data1 = mouse_button_state;
         ev.data2 = AccelerateMouse(x);
         ev.data3 = -AccelerateMouse(y);
-        
+
         D_PostEvent(&ev);
     }
 
@@ -688,7 +805,7 @@ static void I_ReadMouse(void)
 //
 // I_StartTic
 //
-void I_StartTic (void)
+void I_StartTic(void)
 {
     if (!initialized)
     {
@@ -705,19 +822,18 @@ void I_StartTic (void)
     I_UpdateJoystick();
 }
 
-
 //
 // I_UpdateNoBlit
 //
-void I_UpdateNoBlit (void)
+void I_UpdateNoBlit(void)
 {
     // what is this?
 }
 
 static void UpdateGrab(void)
 {
-    static boolean currently_grabbed = false;
-    boolean grab;
+    static boolean    currently_grabbed = false;
+    boolean           grab;
 
     grab = MouseShouldBeGrabbed();
 
@@ -739,7 +855,6 @@ static void UpdateGrab(void)
     }
 
     currently_grabbed = grab;
-
 }
 
 // Update a small portion of the screen
@@ -748,16 +863,16 @@ static void UpdateGrab(void)
 //
 // Return true if blit was successful.
 
-static boolean BlitArea(int x1, int y1, int x2, int y2)
+static boolean BlitArea(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
-    int x_offset, y_offset;
-    boolean result;
+    int32_t    x_offset, y_offset;
+    boolean    result;
 
     // No blit needed on native surface
 
     if (native_surface)
     {
-	return true;
+        return true;
     }
 
     x_offset = (screenbuffer->w - screen_mode->width) / 2;
@@ -766,12 +881,12 @@ static boolean BlitArea(int x1, int y1, int x2, int y2)
     if (SDL_LockSurface(screenbuffer) >= 0)
     {
         I_InitScale(screens[0],
-                    (byte *) screenbuffer->pixels
-                                + (y_offset * screenbuffer->pitch)
-                                + x_offset,
+                    (byte *)screenbuffer->pixels
+                    + (y_offset * screenbuffer->pitch)
+                    + x_offset,
                     screenbuffer->pitch);
         result = screen_mode->DrawScreen(x1, y1, x2, y2);
-      	SDL_UnlockSurface(screenbuffer);
+        SDL_UnlockSurface(screenbuffer);
     }
     else
     {
@@ -781,9 +896,9 @@ static boolean BlitArea(int x1, int y1, int x2, int y2)
     return result;
 }
 
-static void UpdateRect(int x1, int y1, int x2, int y2)
+static void UpdateRect(int32_t x1, int32_t y1, int32_t x2, int32_t y2)
 {
-    int x1_scaled, x2_scaled, y1_scaled, y2_scaled;
+    int32_t    x1_scaled, x2_scaled, y1_scaled, y2_scaled;
 
     // Do stretching and blitting
 
@@ -805,13 +920,15 @@ static void UpdateRect(int x1, int y1, int x2, int y2)
 
 void I_BeginRead(void)
 {
-    byte *screenloc = screens[0]
-                    + (SCREENHEIGHT - LOADING_DISK_H) * SCREENWIDTH
-                    + (SCREENWIDTH - LOADING_DISK_W);
-    int y;
+    byte       *screenloc = screens[0]
+                          + (SCREENHEIGHT - LOADING_DISK_H) * SCREENWIDTH
+                          + (SCREENWIDTH - LOADING_DISK_W);
+    int32_t    y;
 
     if (!initialized || disk_image == NULL)
+    {
         return;
+    }
 
     // save background and copy the disk image in
 
@@ -833,13 +950,15 @@ void I_BeginRead(void)
 
 void I_EndRead(void)
 {
-    byte *screenloc = screens[0]
-                    + (SCREENHEIGHT - LOADING_DISK_H) * SCREENWIDTH
-                    + (SCREENWIDTH - LOADING_DISK_W);
-    int y;
+    byte       *screenloc = screens[0]
+                          + (SCREENHEIGHT - LOADING_DISK_H) * SCREENWIDTH
+                          + (SCREENWIDTH - LOADING_DISK_W);
+    int32_t    y;
 
     if (!initialized || disk_image == NULL)
+    {
         return;
+    }
 
     // save background and copy the disk image in
 
@@ -859,17 +978,21 @@ void I_EndRead(void)
 //
 // I_FinishUpdate
 //
-void I_FinishUpdate (void)
+void I_FinishUpdate(void)
 {
-    static int	lasttic;
-    int		tics;
-    int		i;
+    static int32_t    lasttic;
+    int32_t           tics;
+    int32_t           i;
 
     if (!initialized)
+    {
         return;
+    }
 
     if (noblit)
+    {
         return;
+    }
 
     if (need_resize && SDL_GetTicks() > last_resize_time + 500)
     {
@@ -881,26 +1004,33 @@ void I_FinishUpdate (void)
     UpdateGrab();
 
     // Don't update the screen if the window isn't visible.
-    // Not doing this breaks under Windows when we alt-tab away 
+    // Not doing this breaks under Windows when we alt-tab away
     // while fullscreen.
 
     if (!(SDL_GetAppState() & SDL_APPACTIVE))
+    {
         return;
+    }
 
     // draws little dots on the bottom of the screen
     if (devparm)
     {
+        i = I_GetTime();
+        tics = i - lasttic;
+        lasttic = i;
+        if (tics > 20)
+        {
+            tics = 20;
+        }
 
-	i = I_GetTime();
-	tics = i - lasttic;
-	lasttic = i;
-	if (tics > 20) tics = 20;
-
-	for (i=0 ; i<tics*2 ; i+=4)
-	    screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0xff;
-	for ( ; i<20*4 ; i+=4)
-	    screens[0][ (SCREENHEIGHT-1)*SCREENWIDTH + i] = 0x0;
-    
+        for (i=0; i<tics * 2; i+=4)
+        {
+            screens[0][(SCREENHEIGHT - 1) * SCREENWIDTH + i] = 0xff;
+        }
+        for (; i<20 * 4; i+=4)
+        {
+            screens[0][(SCREENHEIGHT - 1) * SCREENWIDTH + i] = 0x0;
+        }
     }
 
     // draw to screen
@@ -926,7 +1056,7 @@ void I_FinishUpdate (void)
 
     if (screenbuffer != screen)
     {
-        SDL_Rect dst_rect;
+        SDL_Rect    dst_rect;
 
         // Center the buffer within the full screen space.
 
@@ -939,22 +1069,20 @@ void I_FinishUpdate (void)
     SDL_Flip(screen);
 }
 
-
 //
 // I_ReadScreen
 //
-void I_ReadScreen (byte* scr)
+void I_ReadScreen(byte *scr)
 {
-    memcpy (scr, screens[0], SCREENWIDTH*SCREENHEIGHT);
+    memcpy(scr, screens[0], SCREENWIDTH * SCREENHEIGHT);
 }
-
 
 //
 // I_SetPalette
 //
-void I_SetPalette (byte *doompalette)
+void I_SetPalette(byte *doompalette)
 {
-    int i;
+    int32_t    i;
 
     for (i=0; i<256; ++i)
     {
@@ -969,15 +1097,15 @@ void I_SetPalette (byte *doompalette)
     palette_to_set = true;
 }
 
-// 
+//
 // Set the window caption
 //
 
 void I_SetWindowCaption(void)
 {
-    char *buf;
+    char    *buf;
 
-    buf = Z_Malloc(strlen(gamedescription) + strlen(PACKAGE_STRING) + 10, 
+    buf = Z_Malloc(strlen(gamedescription) + strlen(PACKAGE_STRING) + 10,
                    PU_STATIC, NULL);
     sprintf(buf, "%s - %s", gamedescription, PACKAGE_STRING);
 
@@ -990,16 +1118,16 @@ void I_SetWindowCaption(void)
 
 void I_SetWindowIcon(void)
 {
-    SDL_Surface *surface;
-    Uint8 *mask;
-    int i;
+    SDL_Surface    *surface;
+    Uint8          *mask;
+    int32_t        i;
 
     // Generate the mask
-  
+
     mask = malloc(icon_w * icon_h / 8);
     memset(mask, 0, icon_w * icon_h / 8);
 
-    for (i=0; i<icon_w * icon_h; ++i) 
+    for (i=0; i<icon_w * icon_h; ++i)
     {
         if (icon_data[i * 3] != 0x00
          || icon_data[i * 3 + 1] != 0x00
@@ -1026,7 +1154,7 @@ void I_SetWindowIcon(void)
 
 // Pick the modes list to use:
 
-static void GetScreenModes(screen_mode_t ***modes_list, int *num_modes)
+static void GetScreenModes(screen_mode_t ***modes_list, int32_t *num_modes)
 {
     if (aspect_ratio_correct)
     {
@@ -1042,16 +1170,16 @@ static void GetScreenModes(screen_mode_t ***modes_list, int *num_modes)
 
 // Find which screen_mode_t to use for the given width and height.
 
-static screen_mode_t *I_FindScreenMode(int w, int h)
+static screen_mode_t *I_FindScreenMode(int32_t w, int32_t h)
 {
-    screen_mode_t **modes_list;
-    screen_mode_t *best_mode;
-    int modes_list_length;
-    int num_pixels;
-    int best_num_pixels;
-    int i;
+    screen_mode_t    **modes_list;
+    screen_mode_t    *best_mode;
+    int32_t          modes_list_length;
+    int32_t          num_pixels;
+    int32_t          best_num_pixels;
+    int32_t          i;
 
-    // Special case: 320x200 and 640x400 are available even if aspect 
+    // Special case: 320x200 and 640x400 are available even if aspect
     // ratio correction is turned on.  These modes have non-square
     // pixels.
 
@@ -1061,7 +1189,7 @@ static screen_mode_t *I_FindScreenMode(int w, int h)
         {
             return &mode_scale_1x;
         }
-        else if (w == SCREENWIDTH*2 && h == SCREENHEIGHT*2)
+        else if (w == SCREENWIDTH * 2 && h == SCREENHEIGHT * 2)
         {
             return &mode_scale_2x;
         }
@@ -1069,13 +1197,13 @@ static screen_mode_t *I_FindScreenMode(int w, int h)
 
     GetScreenModes(&modes_list, &modes_list_length);
 
-    // Find the biggest screen_mode_t in the list that fits within these 
+    // Find the biggest screen_mode_t in the list that fits within these
     // dimensions
 
     best_mode = NULL;
     best_num_pixels = 0;
 
-    for (i=0; i<modes_list_length; ++i) 
+    for (i=0; i<modes_list_length; ++i)
     {
         // Will this fit within the dimensions? If not, ignore.
 
@@ -1103,17 +1231,17 @@ static screen_mode_t *I_FindScreenMode(int w, int h)
 
 static boolean AutoAdjustFullscreen(void)
 {
-    SDL_Rect **modes;
-    SDL_Rect *best_mode;
-    screen_mode_t *screen_mode;
-    int target_pixels, diff, best_diff;
-    int i;
+    SDL_Rect         **modes;
+    SDL_Rect         *best_mode;
+    screen_mode_t    *screen_mode;
+    int32_t          target_pixels, diff, best_diff;
+    int32_t          i;
 
     modes = SDL_ListModes(NULL, SDL_FULLSCREEN);
 
     // No fullscreen modes available at all?
 
-    if (modes == NULL || modes == (SDL_Rect **) -1 || *modes == NULL)
+    if (modes == NULL || modes == (SDL_Rect **)-1 || *modes == NULL)
     {
         return false;
     }
@@ -1125,7 +1253,7 @@ static boolean AutoAdjustFullscreen(void)
     best_diff = INT_MAX;
     target_pixels = screen_width * screen_height;
 
-    for (i=0; modes[i] != NULL; ++i) 
+    for (i=0; modes[i]!=NULL; ++i)
     {
         //printf("%ix%i?\n", modes[i]->w, modes[i]->h);
 
@@ -1138,7 +1266,7 @@ static boolean AutoAdjustFullscreen(void)
 
         if (screen_mode == NULL || screen_mode->poor_quality)
         {
-        //    printf("\tUnsupported / poor quality\n");
+            //printf("\tUnsupported / poor quality\n");
             continue;
         }
 
@@ -1147,7 +1275,7 @@ static boolean AutoAdjustFullscreen(void)
 
         if (screen_width == modes[i]->w && screen_height == modes[i]->h)
         {
-        //    printf("\tExact mode!\n");
+            //printf("\tExact mode!\n");
             return true;
         }
 
@@ -1158,7 +1286,7 @@ static boolean AutoAdjustFullscreen(void)
 
         if (diff < best_diff)
         {
-        //    printf("\tA valid mode\n");
+            //printf("\tA valid mode\n");
             best_mode = modes[i];
             best_diff = diff;
         }
@@ -1184,7 +1312,7 @@ static boolean AutoAdjustFullscreen(void)
 
 static void AutoAdjustWindowed(void)
 {
-    screen_mode_t *best_mode;
+    screen_mode_t    *best_mode;
 
     // Find a screen_mode_t to fit within the current settings
 
@@ -1214,10 +1342,10 @@ static void AutoAdjustWindowed(void)
 
 static void AutoAdjustColorDepth(void)
 {
-    SDL_Rect **modes;
-    SDL_PixelFormat format;
-    const SDL_VideoInfo *info;
-    int flags;
+    SDL_Rect               **modes;
+    SDL_PixelFormat        format;
+    const SDL_VideoInfo    *info;
+    int32_t                flags;
 
     if (fullscreen)
     {
@@ -1256,7 +1384,7 @@ static void AutoAdjustColorDepth(void)
 
 static void I_AutoAdjustSettings(void)
 {
-    int old_screen_w, old_screen_h, old_screen_bpp;
+    int32_t    old_screen_w, old_screen_h, old_screen_bpp;
 
     old_screen_w = screen_width;
     old_screen_h = screen_height;
@@ -1298,24 +1426,24 @@ static void I_AutoAdjustSettings(void)
 
 // Set video size to a particular scale factor (1x, 2x, 3x, etc.)
 
-static void SetScaleFactor(int factor)
+static void SetScaleFactor(int32_t factor)
 {
     if (fullscreen)
     {
         // In fullscreen, find a mode that will provide this scale factor
 
-        SDL_Rect **modes;
-        SDL_Rect *best_mode;
-        screen_mode_t *scrmode;
-        int best_num_pixels, num_pixels;
-        int i;
+        SDL_Rect         **modes;
+        SDL_Rect         *best_mode;
+        screen_mode_t    *scrmode;
+        int32_t          best_num_pixels, num_pixels;
+        int32_t          i;
 
         modes = SDL_ListModes(NULL, SDL_FULLSCREEN);
 
         best_mode = NULL;
         best_num_pixels = INT_MAX;
 
-        for (i=0; modes[i] != NULL; ++i)
+        for (i=0; modes[i]!=NULL; ++i)
         {
             // What screen_mode_t will this use?
 
@@ -1328,7 +1456,7 @@ static void SetScaleFactor(int factor)
 
             // Only choose modes that fit the requested scale factor.
             //
-            // Note that this allows 320x240 as valid for 1x scale, as 
+            // Note that this allows 320x240 as valid for 1x scale, as
             // 240/200 is rounded down to 1 by integer division.
 
             if ((scrmode->width / SCREENWIDTH) != factor
@@ -1359,7 +1487,7 @@ static void SetScaleFactor(int factor)
     }
     else
     {
-        int w, h;
+        int32_t    w, h;
 
         // Pick 320x200 or 320x240, depending on aspect ratio correct
 
@@ -1368,7 +1496,7 @@ static void SetScaleFactor(int factor)
             w = SCREENWIDTH;
             h = SCREENHEIGHT_4_3;
         }
-        else 
+        else
         {
             w = SCREENWIDTH;
             h = SCREENHEIGHT;
@@ -1381,10 +1509,10 @@ static void SetScaleFactor(int factor)
 
 static void CheckCommandLine(void)
 {
-    int i;
+    int32_t    i;
 
     //!
-    // @category video 
+    // @category video
     //
     // Grab the mouse when running in windowed mode.
     //
@@ -1395,7 +1523,7 @@ static void CheckCommandLine(void)
     }
 
     //!
-    // @category video 
+    // @category video
     //
     // Don't grab the mouse when running in windowed mode.
     //
@@ -1409,7 +1537,7 @@ static void CheckCommandLine(void)
     // nofullscreen because we love prboom
 
     //!
-    // @category video 
+    // @category video
     //
     // Run in a window.
     //
@@ -1420,7 +1548,7 @@ static void CheckCommandLine(void)
     }
 
     //!
-    // @category video 
+    // @category video
     //
     // Run in fullscreen mode.
     //
@@ -1431,7 +1559,7 @@ static void CheckCommandLine(void)
     }
 
     //!
-    // @category video 
+    // @category video
     //
     // Disable the mouse.
     //
@@ -1504,7 +1632,7 @@ static void CheckCommandLine(void)
 
     if (i > 0)
     {
-        int w, h;
+        int32_t    w, h;
 
         if (sscanf(myargv[i + 1], "%ix%i", &w, &h) == 2)
         {
@@ -1519,7 +1647,7 @@ static void CheckCommandLine(void)
     // Don't scale up the screen.
     //
 
-    if (M_CheckParm("-1")) 
+    if (M_CheckParm("-1"))
     {
         SetScaleFactor(1);
     }
@@ -1530,7 +1658,7 @@ static void CheckCommandLine(void)
     // Double up the screen to 2x its normal size.
     //
 
-    if (M_CheckParm("-2")) 
+    if (M_CheckParm("-2"))
     {
         SetScaleFactor(2);
     }
@@ -1541,7 +1669,7 @@ static void CheckCommandLine(void)
     // Double up the screen to 3x its normal size.
     //
 
-    if (M_CheckParm("-3")) 
+    if (M_CheckParm("-3"))
     {
         SetScaleFactor(3);
     }
@@ -1551,7 +1679,7 @@ static void CheckCommandLine(void)
 
 void I_CheckIsScreensaver(void)
 {
-    char *env;
+    char    *env;
 
     env = getenv("XSCREENSAVER_WINDOW");
 
@@ -1563,7 +1691,7 @@ void I_CheckIsScreensaver(void)
 
 static void CreateCursors(void)
 {
-    static Uint8 empty_cursor_data = 0;
+    static Uint8    empty_cursor_data = 0;
 
     // Save the default cursor so it can be recalled later
 
@@ -1583,7 +1711,7 @@ static void SetSDLVideoDriver(void)
 
     if (strcmp(video_driver, "") != 0)
     {
-        char *env_string;
+        char    *env_string;
 
         env_string = malloc(strlen(video_driver) + 30);
         sprintf(env_string, "SDL_VIDEODRIVER=%s", video_driver);
@@ -1596,7 +1724,7 @@ static void SetSDLVideoDriver(void)
     // Allow -gdi as a shortcut for using the windib driver.
 
     //!
-    // @category video 
+    // @category video
     // @platform windows
     //
     // Use the Windows GDI driver instead of DirectX.
@@ -1607,11 +1735,11 @@ static void SetSDLVideoDriver(void)
         putenv("SDL_VIDEODRIVER=windib");
     }
 
-    // From the SDL 1.2.10 release notes: 
+    // From the SDL 1.2.10 release notes:
     //
-    // > The "windib" video driver is the default now, to prevent 
-    // > problems with certain laptops, 64-bit Windows, and Windows 
-    // > Vista. 
+    // > The "windib" video driver is the default now, to prevent
+    // > problems with certain laptops, 64-bit Windows, and Windows
+    // > Vista.
     //
     // The hell with that.
 
@@ -1622,13 +1750,13 @@ static void SetSDLVideoDriver(void)
 #endif
 }
 
-static char *WindowBoxType(screen_mode_t *mode, int w, int h)
+static char *WindowBoxType(screen_mode_t *mode, int32_t w, int32_t h)
 {
-    if (mode->width != w && mode->height != h) 
+    if (mode->width != w && mode->height != h)
     {
         return "Windowboxed";
     }
-    else if (mode->width == w) 
+    else if (mode->width == w)
     {
         return "Letterboxed";
     }
@@ -1642,10 +1770,10 @@ static char *WindowBoxType(screen_mode_t *mode, int w, int h)
     }
 }
 
-static void SetVideoMode(screen_mode_t *mode, int w, int h)
+static void SetVideoMode(screen_mode_t *mode, int32_t w, int32_t h)
 {
-    byte *doompal;
-    int flags = 0;
+    byte       *doompal;
+    int32_t    flags = 0;
 
     doompal = W_CacheLumpName(DEH_String("PLAYPAL"), PU_CACHE);
 
@@ -1743,9 +1871,9 @@ static void SetVideoMode(screen_mode_t *mode, int w, int h)
     screen_mode = mode;
 }
 
-static void ApplyWindowResize(unsigned int w, unsigned int h)
+static void ApplyWindowResize(uint32_t w, uint32_t h)
 {
-    screen_mode_t *mode;
+    screen_mode_t    *mode;
 
     // Find the biggest screen mode that will fall within these
     // dimensions, falling back to the smallest mode possible if
@@ -1771,11 +1899,11 @@ static void ApplyWindowResize(unsigned int w, unsigned int h)
 
 void I_InitGraphics(void)
 {
-    SDL_Event dummy;
-    byte *doompal;
-    char *env;
+    SDL_Event    dummy;
+    byte         *doompal;
+    char         *env;
 
-    // Pass through the XSCREENSAVER_WINDOW environment variable to 
+    // Pass through the XSCREENSAVER_WINDOW environment variable to
     // SDL_WINDOWID, to embed the SDL window into the Xscreensaver
     // window.
 
@@ -1783,8 +1911,8 @@ void I_InitGraphics(void)
 
     if (env != NULL)
     {
-        char winenv[30];
-        int winid;
+        char       winenv[30];
+        int32_t    winid;
 
         sscanf(env, "0x%x", &winid);
         sprintf(winenv, "SDL_WINDOWID=%i", winid);
@@ -1794,7 +1922,7 @@ void I_InitGraphics(void)
 
     SetSDLVideoDriver();
 
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) 
+    if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         I_Error("Failed to initialize video: %s", SDL_GetError());
     }
@@ -1824,7 +1952,7 @@ void I_InitGraphics(void)
     }
     else
     {
-        int w, h;
+        int32_t    w, h;
 
         if (autoadjust_video_settings)
         {
@@ -1894,14 +2022,14 @@ void I_InitGraphics(void)
 
     if (native_surface)
     {
-	screens[0] = (unsigned char *) screen->pixels;
+        screens[0] = (uint8_t *)screen->pixels;
 
         screens[0] += (screen->h - SCREENHEIGHT) / 2;
     }
     else
     {
-	screens[0] = (unsigned char *) Z_Malloc (SCREENWIDTH * SCREENHEIGHT,
-                                                 PU_STATIC, NULL);
+        screens[0] = (uint8_t *)Z_Malloc(SCREENWIDTH * SCREENHEIGHT,
+                                         PU_STATIC, NULL);
     }
 
     // "Loading from disk" icon
@@ -1923,8 +2051,11 @@ void I_InitGraphics(void)
     SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
     // clear out any events waiting at the start and center the mouse
-  
-    while (SDL_PollEvent(&dummy));
+
+    while (SDL_PollEvent(&dummy))
+    {
+        ;
+    }
 
     if (usemouse && !nomouse && (fullscreen || grabmouse))
     {
@@ -1933,4 +2064,3 @@ void I_InitGraphics(void)
 
     initialized = true;
 }
-

@@ -20,7 +20,7 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//	System specific interface stuff.
+//    System specific interface stuff.
 //
 //-----------------------------------------------------------------------------
 
