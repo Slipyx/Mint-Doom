@@ -1291,7 +1291,7 @@ void AM_drawWalls(void)
                       != lines[i].frontsector->ceilingheight)
                 {
                     // ceiling level change
-                    AM_drawMline(&l, CDWALLCOLORS+lightlev);
+                    AM_drawMline(&l, CDWALLCOLORS + lightlev);
                 }
                 else if (cheating)
                 {
