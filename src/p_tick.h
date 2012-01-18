@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -20,22 +20,16 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//	?
+//    ?
 //
 //-----------------------------------------------------------------------------
-
 
 #ifndef __P_TICK__
 #define __P_TICK__
 
-
-
-
 // Called by C_Ticker,
 // can call G_PlayerExited.
 // Carries out all thinking of monsters and players.
-void P_Ticker (void);
-
-
+void P_Ticker(void);
 
 #endif

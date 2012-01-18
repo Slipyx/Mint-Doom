@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -33,51 +33,45 @@
 // I_GetTime
 // returns time in 1/35th second tics
 //
+static Uint32    basetime = 0;
 
-static Uint32 basetime = 0;
-
-int  I_GetTime (void)
+int32_t I_GetTime(void)
 {
-    Uint32 ticks;
-
-    ticks = SDL_GetTicks();
+    Uint32    ticks = SDL_GetTicks();
 
     if (basetime == 0)
+    {
         basetime = ticks;
+    }
 
     ticks -= basetime;
 
-    return (ticks * TICRATE) / 1000;    
+    return (ticks * TICRATE) / 1000;
 }
 
 //
 // Same as I_GetTime, but returns time in milliseconds
 //
-
-int I_GetTimeMS(void)
+int32_t I_GetTimeMS(void)
 {
-    Uint32 ticks;
-
-    ticks = SDL_GetTicks();
+    Uint32    ticks = SDL_GetTicks();
 
     if (basetime == 0)
+    {
         basetime = ticks;
+    }
 
     return ticks - basetime;
 }
 
 // Sleep for a specified number of ms
-
-void I_Sleep(int ms)
+void I_Sleep(int32_t ms)
 {
     SDL_Delay(ms);
 }
 
-
 void I_InitTimer(void)
 {
     // initialize timer
-
     SDL_Init(SDL_INIT_TIMER);
 }
-

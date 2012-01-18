@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -22,6 +22,7 @@
 // DESCRIPTION:
 //       Generate a checksum of the WAD directory.
 //
+//-----------------------------------------------------------------------------
 
 #ifndef W_CHECKSUM_H
 #define W_CHECKSUM_H
@@ -31,4 +32,3 @@
 extern void W_Checksum(md5_digest_t digest);
 
 #endif /* #ifndef W_CHECKSUM_H */
-

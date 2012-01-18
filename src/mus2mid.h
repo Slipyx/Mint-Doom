@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -20,9 +20,11 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 //
+// DESCRIPTION:
+//     mus2mid.h - Ben Ryves 2006 - http://benryves.com - benryves@benryves.com
+//     Use to convert a MUS file into a single track, type 0 MIDI file.
 //
-// mus2mid.h - Ben Ryves 2006 - http://benryves.com - benryves@benryves.com
-// Use to convert a MUS file into a single track, type 0 MIDI file.
+//-----------------------------------------------------------------------------
 
 #ifndef MUS2MID_H
 #define MUS2MID_H
@@ -33,4 +35,3 @@
 boolean mus2mid(MEMFILE *musinput, MEMFILE *midioutput);
 
 #endif /* #ifndef MUS2MID_H */
-

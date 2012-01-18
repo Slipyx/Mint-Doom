@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 2005 Simon Howard
@@ -18,14 +18,14 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 //
-// Graphical stuff related to the networking code:
+// DESCRIPTION:
+//     Graphical stuff related to the networking code:
+//     * The client waiting screen when we are waiting for the server to
+//       start the game.
 //
-//  * The client waiting screen when we are waiting for the server to
-//    start the game.
-//   
+//-----------------------------------------------------------------------------
 
-
-#ifndef NET_GUI_H 
+#ifndef NET_GUI_H
 #define NET_GUI_H
 
 #include "doomtype.h"
@@ -33,4 +33,3 @@
 extern void NET_WaitForStart();
 
 #endif /* #ifndef NET_GUI_H */
-

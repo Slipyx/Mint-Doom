@@ -28,7 +28,7 @@
 #define __D_ITEMS__
 
 #include "doomdef.h"
-#include <inttypes.h>
+#include "doomtype.h"
 
 // Weapon info: sprite frames, ammunition use.
 typedef struct

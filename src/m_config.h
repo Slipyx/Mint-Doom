@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -21,9 +21,8 @@
 //
 // DESCRIPTION:
 //      Configuration file interface.
-//    
+//
 //-----------------------------------------------------------------------------
-
 
 #ifndef __M_CONFIG__
 #define __M_CONFIG__

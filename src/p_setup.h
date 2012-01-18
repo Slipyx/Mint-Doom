@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -24,22 +24,14 @@
 //
 //-----------------------------------------------------------------------------
 
-
 #ifndef __P_SETUP__
 #define __P_SETUP__
 
-
-
-
 // NOT called by W_Ticker. Fixme.
-void
-P_SetupLevel
-( int		episode,
-  int		map,
-  int		playermask,
-  skill_t	skill);
+void P_SetupLevel(int32_t episode, int32_t map,
+                  int32_t playermask, skill_t skill);
 
 // Called by startup code.
-void P_Init (void);
+void P_Init(void);
 
 #endif
