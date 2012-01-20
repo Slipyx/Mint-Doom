@@ -154,10 +154,10 @@ pkg/Makefile
 pkg/config.make
 pkg/osx/Info.plist
 pkg/osx/Info-gnustep.plist
-setup/Makefile
-setup/setup.desktop
-setup/setup-res.rc
-setup/setup-manifest.xml
+src/setup/Makefile
+src/setup/setup.desktop
+src/setup/setup-res.rc
+src/setup/setup-manifest.xml
 data/Makefile
 src/Makefile
 src/doom.desktop

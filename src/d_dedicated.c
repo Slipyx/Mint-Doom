@@ -26,6 +26,7 @@
 
 #include "config.h"
 
+#include "doomtype.h"
 #include "m_argv.h"
 #include "net_defs.h"
 

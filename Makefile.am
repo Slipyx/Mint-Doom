@@ -46,7 +46,7 @@ doc_DATA=$(DOC_FILES)
 
 MAINTAINERCLEANFILES =  $(AUX_DIST_GEN)
 
-SUBDIRS=wince textscreen opl pcsound data src man setup
+SUBDIRS=wince textscreen opl pcsound data src man src/setup
 DIST_SUBDIRS=pkg $(SUBDIRS)
 
 if HAVE_PYTHON
