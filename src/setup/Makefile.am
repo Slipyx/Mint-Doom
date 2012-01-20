@@ -50,7 +50,7 @@ app_DATA = @PROGRAM_PREFIX@setup.desktop
 if HAVE_PYTHON
 
 setup_icon.c : ../data/setup8.ico
-	../data/convert-icon ../data/setup8.ico $@
+	../../data/convert-icon ../../data/setup8.ico $@
 
 endif
 
