@@ -40,6 +40,7 @@
 #include "w_wad.h"
 
 #include "r_local.h"
+#include "r_draw.h"
 
 #include "doomstat.h"
 
@@ -379,6 +380,7 @@ void R_DrawMaskedColumn (column_t* column)
 
 	    // Drawn by either R_DrawColumn
 	    //  or (SHADOW) R_DrawFuzzColumn.
+        dc_texheight = 0;
 	    colfunc ();	
 	}
 	column = (column_t *)(  (byte *)column + column->length + 4);

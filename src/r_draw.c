@@ -109,7 +109,7 @@ void R_DrawColumn (void)
     int			count; 
     byte*		dest; 
     fixed_t		frac;
-    fixed_t		fracstep;	 
+    fixed_t		fracstep;
  
     count = dc_yh - dc_yl; 
 
@@ -137,16 +137,52 @@ void R_DrawColumn (void)
     // Inner loop that does the actual texture mapping,
     //  e.g. a DDA-lile scaling.
     // This is as fast as it gets.
-    do 
+    // [tm512] - Fix tutti-frutti bug - 01/20/2012
     {
-	// Re-map color indices from wall texture column
-	//  using a lighting/special effects LUT.
-	*dest = dc_colormap[dc_source[(frac>>FRACBITS)&127]];
-	
-	dest += SCREENWIDTH; 
-	frac += fracstep;
-	
-    } while (count--); 
+        int heightmask = dc_texheight - 1;
+
+        if (dc_texheight & heightmask) // Texture height is not a power of 2
+        {
+            heightmask ++;
+            heightmask <<= FRACBITS;
+
+            if (frac < 0)
+            {
+                while ((frac += heightmask) < 0);
+            }
+            else
+            {
+                while (frac >= heightmask)
+                {
+                    frac -= heightmask;
+                }
+            }
+
+            do
+            {
+                // Re-map color indices from wall texture column
+                // using a lighting/special effects LUT.
+                *dest = dc_colormap [dc_source [frac >> FRACBITS]];
+                dest += SCREENWIDTH;
+
+                if ((frac += fracstep) >= heightmask)
+                {
+                    frac -= heightmask;
+                }
+            } while (count--);
+        }
+        else
+        {
+            do
+            {
+                // Re-map color indices from wall texture column
+                // using a lighting/special effects LUT.
+                *dest = dc_colormap [dc_source [(frac >> FRACBITS) & heightmask]];
+                dest += SCREENWIDTH;
+                frac += fracstep;
+            } while (count--);
+        }
+    }
 } 
 
 
