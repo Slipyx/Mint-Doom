@@ -1,7 +1,7 @@
 
 gamesdir = $(prefix)/games
 
-AM_CFLAGS = -I../textscreen -I../src @SDLMIXER_CFLAGS@
+AM_CFLAGS = -I../../textscreen -I../../src @SDLMIXER_CFLAGS@
 
 games_PROGRAMS = @PROGRAM_PREFIX@setup
 
@@ -31,8 +31,8 @@ else
 endif
 
 @PROGRAM_PREFIX@setup_LDADD =                        \
-                       ../wince/libc_wince.a         \
-                       ../textscreen/libtextscreen.a \
+                       ../../wince/libc_wince.a         \
+                       ../../textscreen/libtextscreen.a \
                        @SDLMIXER_LIBS@               \
                        @LDFLAGS@
 
@@ -50,7 +50,7 @@ app_DATA = @PROGRAM_PREFIX@setup.desktop
 if HAVE_PYTHON
 
 setup_icon.c : ../data/setup8.ico
-	../data/convert-icon ../data/setup8.ico $@
+	../../data/convert-icon ../../data/setup8.ico $@
 
 endif
 
