@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 2006 Simon Howard
@@ -18,6 +18,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 //
+//-----------------------------------------------------------------------------
 
 #ifndef SETUP_SOUND_H
 #define SETUP_SOUND_H
@@ -36,19 +37,18 @@ enum
     SNDDEVICE_AWE32 = 9,
 };
 
-extern int snd_sfxdevice;
-extern int numChannels;
-extern int sfxVolume;
+extern int32_t    snd_sfxdevice;
+extern int32_t    numChannels;
+extern int32_t    sfxVolume;
 
-extern int snd_musicdevice;
-extern int musicVolume;
+extern int32_t    snd_musicdevice;
+extern int32_t    musicVolume;
 
-extern int snd_samplerate;
-extern int opl_io_port;
+extern int32_t    snd_samplerate;
+extern int32_t    opl_io_port;
 
-extern int use_libsamplerate;
+extern int32_t    use_libsamplerate;
 
 void ConfigSound(void);
 
-#endif /* #ifndef SETUP_SOUND_H */
-
+#endif // #ifndef SETUP_SOUND_H

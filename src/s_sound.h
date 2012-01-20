@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -20,10 +20,9 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//	The not so system specific sound interface.
+//    The not so system specific sound interface.
 //
 //-----------------------------------------------------------------------------
-
 
 #ifndef __S_SOUND__
 #define __S_SOUND__
@@ -31,7 +30,7 @@
 #include "p_mobj.h"
 #include "sounds.h"
 
-typedef enum 
+typedef enum
 {
     SNDDEVICE_NONE = 0,
     SNDDEVICE_PCSPEAKER = 1,
@@ -51,8 +50,8 @@ typedef struct
 {
     // List of sound devices that this sound module is used for.
 
-    snddevice_t *sound_devices;
-    int num_sound_devices;
+    snddevice_t    *sound_devices;
+    int32_t        num_sound_devices;
 
     // Initialize sound module
     // Returns true if successfully initialized
@@ -65,7 +64,7 @@ typedef struct
 
     // Returns the lump index of the given sound.
 
-    int (*GetSfxLumpNum)(sfxinfo_t *sfxinfo);
+    int32_t (*GetSfxLumpNum)(sfxinfo_t *sfxinfo);
 
     // Called periodically to update the subsystem.
 
@@ -73,21 +72,20 @@ typedef struct
 
     // Update the sound settings on the given channel.
 
-    void (*UpdateSoundParams)(int channel, int vol, int sep);
+    void (*UpdateSoundParams)(int32_t channel, int32_t vol, int32_t sep);
 
     // Start a sound on a given channel.  Returns the channel id
     // or -1 on failure.
 
-    int (*StartSound)(int id, int channel, int vol, int sep);
+    int32_t (*StartSound)(int32_t id, int32_t channel, int32_t vol, int32_t sep);
 
     // Stop the sound playing on the given channel.
 
-    void (*StopSound)(int channel);
+    void (*StopSound)(int32_t channel);
 
     // Query if a sound is playing on the given channel
 
-    boolean (*SoundIsPlaying)(int channel);
-
+    boolean (*SoundIsPlaying)(int32_t channel);
 } sound_module_t;
 
 // Interface for music modules
@@ -96,8 +94,8 @@ typedef struct
 {
     // List of sound devices that this music module is used for.
 
-    snddevice_t *sound_devices;
-    int num_sound_devices;
+    snddevice_t    *sound_devices;
+    int32_t        num_sound_devices;
 
     // Initialize the music subsystem
 
@@ -109,7 +107,7 @@ typedef struct
 
     // Set music volume - range 0-127
 
-    void (*SetMusicVolume)(int volume);
+    void (*SetMusicVolume)(int32_t volume);
 
     // Pause music
 
@@ -122,7 +120,7 @@ typedef struct
     // Register a song handle from data
     // Returns a handle that can be used to play the song
 
-    void *(*RegisterSong)(void *data, int len);
+    void *(*RegisterSong)(void *data, int32_t len);
 
     // Un-register (free) song data
 
@@ -130,7 +128,7 @@ typedef struct
 
     // Play the song
 
-    void (*PlaySong)(void *handle, int looping);
+    void (*PlaySong)(void *handle, int32_t looping);
 
     // Stop playing the current song.
 
@@ -141,50 +139,48 @@ typedef struct
     boolean (*MusicIsPlaying)(void);
 } music_module_t;
 
-extern int snd_sfxdevice;
-extern int snd_musicdevice;
-extern int snd_samplerate;
+extern int32_t    snd_sfxdevice;
+extern int32_t    snd_musicdevice;
+extern int32_t    snd_samplerate;
+
+// JoshK: Declare extern numChannels here so it is available in i_sdlsound.c
+//  for use in dynamically allocating the channels_playing array
+extern int32_t    numChannels;
 
 //
 // Initializes sound stuff, including volume
 // Sets channels, SFX and music volume,
 //  allocates channel buffer, sets S_sfx lookup.
 //
+void S_Init(int32_t sfxVolume, int32_t musicVolume);
 
-void S_Init(int sfxVolume, int musicVolume);
-
-
-// Shut down sound 
-
+//
+// Shut down sound
+//
 void S_Shutdown(void);
-
-
 
 //
 // Per level startup code.
 // Kills playing sounds at start of level,
 //  determines music if any, changes music.
 //
-
 void S_Start(void);
 
 //
 // Start sound for thing at <origin>
 //  using <sound_id> from sounds.h
 //
-
-void S_StartSound(void *origin, int sound_id);
+void S_StartSound(void *origin, int32_t sound_id);
 
 // Stop sound for thing at <origin>
 void S_StopSound(mobj_t *origin);
 
-
 // Start music using <music_id> from sounds.h
-void S_StartMusic(int music_id);
+void S_StartMusic(int32_t music_id);
 
 // Start music using <music_id> from sounds.h,
 //  and set whether looping
-void S_ChangeMusic(int music_id, int looping);
+void S_ChangeMusic(int32_t music_id, int32_t looping);
 
 // query if music is playing
 boolean S_MusicPlaying(void);
@@ -196,15 +192,12 @@ void S_StopMusic(void);
 void S_PauseSound(void);
 void S_ResumeSound(void);
 
-
 //
 // Updates music & sounds
 //
 void S_UpdateSounds(mobj_t *listener);
 
-void S_SetMusicVolume(int volume);
-void S_SetSfxVolume(int volume);
-
+void S_SetMusicVolume(int32_t volume);
+void S_SetSfxVolume(int32_t volume);
 
 #endif
-

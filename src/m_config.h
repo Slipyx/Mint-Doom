@@ -32,6 +32,6 @@ void M_SaveDefaults(void);
 void M_SetConfigDir(void);
 void M_ApplyPlatformDefaults(void);
 
-extern char *configdir;
+extern char    *configdir;
 
 #endif

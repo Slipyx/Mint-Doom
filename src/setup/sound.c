@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 2006 Simon Howard
@@ -18,8 +18,10 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 //
-
-// Sound control menu
+// DESCRIPTION:
+//     Sound control menu
+//
+//-----------------------------------------------------------------------------
 
 #include <stdlib.h>
 
@@ -43,34 +45,34 @@ typedef enum
     NUM_MUSMODES
 } musmode_t;
 
-static char *sfxmode_strings[] = 
+static char    *sfxmode_strings[] =
 {
     "Disabled",
     "PC speaker",
     "Digital",
 };
 
-static char *musmode_strings[] =
+static char    *musmode_strings[] =
 {
     "Disabled",
     "OPL (Adlib/SB)",
     "Native MIDI"
 };
 
-int snd_sfxdevice = SNDDEVICE_SB;
-int numChannels = 8;
-int sfxVolume = 8;
+int32_t    snd_sfxdevice = SNDDEVICE_SB;
+int32_t    numChannels = 8;
+int32_t    sfxVolume = 8;
 
-int snd_musicdevice = SNDDEVICE_GENMIDI;
-int musicVolume = 8;
+int32_t    snd_musicdevice = SNDDEVICE_GENMIDI;
+int32_t    musicVolume = 8;
 
-int snd_samplerate = 44100;
-int opl_io_port = 0x388;
+int32_t    snd_samplerate = 44100;
+int32_t    opl_io_port = 0x388;
 
-int use_libsamplerate = 0;
+int32_t    use_libsamplerate = 0;
 
-static int snd_sfxmode;
-static int snd_musmode;
+static int32_t    snd_sfxmode;
+static int32_t    snd_musmode;
 
 static void UpdateSndDevices(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(data))
 {
@@ -103,11 +105,11 @@ static void UpdateSndDevices(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(data))
 
 void ConfigSound(void)
 {
-    txt_window_t *window;
-    txt_table_t *sfx_table;
-    txt_table_t *music_table;
-    txt_dropdown_list_t *sfx_mode_control;
-    txt_dropdown_list_t *mus_mode_control;
+    txt_window_t           *window;
+    txt_table_t            *sfx_table;
+    txt_table_t            *music_table;
+    txt_dropdown_list_t    *sfx_mode_control;
+    txt_dropdown_list_t    *mus_mode_control;
 
     if (snd_sfxdevice == SNDDEVICE_PCSPEAKER)
     {
@@ -140,21 +142,22 @@ void ConfigSound(void)
     window = TXT_NewWindow("Sound configuration");
 
     TXT_AddWidgets(window,
-               TXT_NewSeparator("Sound effects"),
-               sfx_table = TXT_NewTable(2),
-               TXT_NewSeparator("Music"),
-               music_table = TXT_NewTable(2),
-               NULL);
+                   TXT_NewSeparator("Sound effects"),
+                   sfx_table = TXT_NewTable(2),
+                   TXT_NewSeparator("Music"),
+                   music_table = TXT_NewTable(2),
+                   NULL);
 
     TXT_SetColumnWidths(sfx_table, 20, 14);
 
-    TXT_AddWidgets(sfx_table, 
+    TXT_AddWidgets(sfx_table,
                    TXT_NewLabel("Sound effects"),
                    sfx_mode_control = TXT_NewDropdownList(&snd_sfxmode,
                                                           sfxmode_strings,
                                                           NUM_SFXMODES),
                    TXT_NewLabel("Sound channels"),
-                   TXT_NewSpinControl(&numChannels, 1, 8),
+                   // JoshK: Allow setting up to 32 channels
+                   TXT_NewSpinControl(&numChannels, 1, 32),
                    TXT_NewLabel("SFX volume"),
                    TXT_NewSpinControl(&sfxVolume, 0, 15),
                    NULL);
@@ -175,4 +178,3 @@ void ConfigSound(void)
     TXT_SignalConnect(mus_mode_control, "changed",
                       UpdateSndDevices, NULL);
 }
-
