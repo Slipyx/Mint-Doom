@@ -96,7 +96,7 @@ static opl_timer_t timer2 = { 3125, 0, 0, 0 };
 // SDL parameters.
 
 static int sdl_was_initialized = 0;
-static int mixing_freq, mixing_channels;
+static uint32_t mixing_freq, mixing_channels;
 static Uint16 mixing_format;
 
 static int SDLIsInitialized(void)
