@@ -18,8 +18,10 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
 // 02111-1307, USA.
 //
-// Code specific to the standalone dedicated server.
+// DESCRIPTION:
+//     Code specific to the standalone dedicated server.
 //
+//-----------------------------------------------------------------------------
 
 #include <stdlib.h>
 #include <stdarg.h>
