@@ -1922,6 +1922,9 @@ void I_InitGraphics(void)
 
     SetSDLVideoDriver();
 
+    // JoshK: Center window
+    SDL_putenv("SDL_VIDEO_CENTERED=center");
+
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         I_Error("Failed to initialize video: %s", SDL_GetError());

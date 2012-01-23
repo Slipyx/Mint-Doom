@@ -69,7 +69,7 @@
 #define ENDGAME    "are you sure you want to end the game?\n\n"PRESSYN
 
 // JoshK: General quit message
-#define DOSY    "(press y to quit.)"
+#define DOSY    "(press y to quit)"
 
 #define DETAILHI       "High detail"
 #define DETAILLO       "Low detail"

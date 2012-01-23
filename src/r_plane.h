@@ -1,4 +1,4 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
@@ -20,65 +20,40 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//	Refresh, visplane stuff (floor, ceilings).
+//    Refresh, visplane stuff (floor, ceilings).
 //
 //-----------------------------------------------------------------------------
-
 
 #ifndef __R_PLANE__
 #define __R_PLANE__
 
-
 #include "r_data.h"
 
-
-
 // Visplane related.
-extern  short*		lastopening;
+extern int16_t    *lastopening;
 
+typedef void (*planefunction_t)(int32_t top, int32_t bottom);
 
-typedef void (*planefunction_t) (int top, int bottom);
+extern planefunction_t    floorfunc;
+extern planefunction_t    ceilingfunc_t;
 
-extern planefunction_t	floorfunc;
-extern planefunction_t	ceilingfunc_t;
+extern int16_t    floorclip[SCREENWIDTH];
+extern int16_t    ceilingclip[SCREENWIDTH];
 
-extern short		floorclip[SCREENWIDTH];
-extern short		ceilingclip[SCREENWIDTH];
+extern fixed_t    yslope[SCREENHEIGHT];
+extern fixed_t    distscale[SCREENWIDTH];
 
-extern fixed_t		yslope[SCREENHEIGHT];
-extern fixed_t		distscale[SCREENWIDTH];
+void R_InitPlanes(void);
+void R_ClearPlanes(void);
 
-void R_InitPlanes (void);
-void R_ClearPlanes (void);
+void R_MapPlane(int32_t y, int32_t x1, int32_t x2);
 
-void
-R_MapPlane
-( int		y,
-  int		x1,
-  int		x2 );
+void R_MakeSpans(int32_t x, int32_t t1, int32_t b1, int32_t t2, int32_t b2);
 
-void
-R_MakeSpans
-( int		x,
-  int		t1,
-  int		b1,
-  int		t2,
-  int		b2 );
+void R_DrawPlanes(void);
 
-void R_DrawPlanes (void);
+visplane_t *R_FindPlane(fixed_t height, int32_t picnum, int32_t lightlevel);
 
-visplane_t*
-R_FindPlane
-( fixed_t	height,
-  int		picnum,
-  int		lightlevel );
-
-visplane_t*
-R_CheckPlane
-( visplane_t*	pl,
-  int		start,
-  int		stop );
-
-
+visplane_t *R_CheckPlane(visplane_t *pl, int32_t start, int32_t stop);
 
 #endif

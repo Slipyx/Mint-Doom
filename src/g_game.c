@@ -817,6 +817,53 @@ extern gamestate_t    wipegamestate;
 void G_DoLoadLevel(void)
 {
     int32_t    i;
+    char       *skytexturename;
+
+    // Set the sky to use.
+    //
+    // JoshK: Moved from G_InitNew to here so correct sky is set on level load
+
+    if (gamemode == commercial)
+    {
+        if (gamemap < 12)
+        {
+            skytexturename = "SKY1";
+        }
+        else if (gamemap < 21)
+        {
+            skytexturename = "SKY2";
+        }
+        else
+        {
+            skytexturename = "SKY3";
+        }
+    }
+    else
+    {
+        switch (gameepisode)
+        {
+            default:
+            case 1:
+                skytexturename = "SKY1";
+                break;
+
+            case 2:
+                skytexturename = "SKY2";
+                break;
+
+            case 3:
+                skytexturename = "SKY3";
+                break;
+
+            case 4:    // Special Edition sky
+                skytexturename = "SKY4";
+                break;
+        }
+    }
+
+    skytexturename = DEH_String(skytexturename);
+
+    skytexture = R_TextureNumForName(skytexturename);
 
     // Set the sky map.
     // First thing, we have a dummy sky texture name,
@@ -1899,7 +1946,6 @@ extern int32_t    skytexture;
 
 void G_InitNew(skill_t skill, int32_t episode, int32_t map)
 {
-    char       *skytexturename;
     int32_t    i;
 
     if (paused)
@@ -2002,57 +2048,7 @@ void G_InitNew(skill_t skill, int32_t episode, int32_t map)
 
     viewactive = true;
 
-    // Set the sky to use.
-    //
-    // Note: This IS broken, but it is how Vanilla Doom behaves.
-    // See http://doom.wikia.com/wiki/Sky_never_changes_in_Doom_II.
-    //
-    // Because we set the sky here at the start of a game, not at the
-    // start of a level, the sky texture never changes unless we
-    // restore from a saved game.  This was fixed before the Doom
-    // source release, but this IS the way Vanilla DOS Doom behaves.
-
-    if (gamemode == commercial)
-    {
-        if (gamemap < 12)
-        {
-            skytexturename = "SKY1";
-        }
-        else if (gamemap < 21)
-        {
-            skytexturename = "SKY2";
-        }
-        else
-        {
-            skytexturename = "SKY3";
-        }
-    }
-    else
-    {
-        switch (gameepisode)
-        {
-            default:
-            case 1:
-                skytexturename = "SKY1";
-                break;
-
-            case 2:
-                skytexturename = "SKY2";
-                break;
-
-            case 3:
-                skytexturename = "SKY3";
-                break;
-
-            case 4:    // Special Edition sky
-                skytexturename = "SKY4";
-                break;
-        }
-    }
-
-    skytexturename = DEH_String(skytexturename);
-
-    skytexture = R_TextureNumForName(skytexturename);
+    // JoshK: Moved setting sky from here to G_DoLoadLevel
 
     G_DoLoadLevel();
 }

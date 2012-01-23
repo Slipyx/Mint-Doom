@@ -498,7 +498,8 @@ static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     // From _GG1_ p.428. Appox. eucledian distance fast.
     approx_dist = adx + ady - ((adx < ady ? adx : ady) >> 1);
 
-    if (gamemap != 8 && approx_dist > S_CLIPPING_DIST)
+    // JoshK: Sound behaves properly on level 8
+    if (/*gamemap != 8 &&*/ approx_dist > S_CLIPPING_DIST)
     {
         return 0;
     }
@@ -528,7 +529,8 @@ static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
     {
         *vol = snd_SfxVolume;
     }
-    else if (gamemap == 8)
+    // JoshK: Sound behaves properly on level 8
+    /*else if (gamemap == 8)
     {
         if (approx_dist > S_CLIPPING_DIST)
         {
@@ -538,7 +540,7 @@ static int32_t S_AdjustSoundParams(mobj_t *listener, mobj_t *source,
         *vol = 15 + ((snd_SfxVolume - 15)
                   * ((S_CLIPPING_DIST - approx_dist) >> FRACBITS))
                   / S_ATTENUATOR;
-    }
+    }*/
     else
     {
         // distance effect
