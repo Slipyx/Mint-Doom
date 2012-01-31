@@ -395,15 +395,17 @@ typedef struct
 //
 // Now what is a visplane, anyway?
 //
-typedef struct
+struct visplane_s
 {
+    struct visplane_s    *next; // Next visplane in hash chain. -- killough
+
     fixed_t    height;
     int32_t    picnum;
     int32_t    lightlevel;
     int32_t    minx;
     int32_t    maxx;
 
-    // leave pads for [minx-1]/[maxx+1]
+    // leave pads for [minx - 1] / [maxx + 1]
 
     byte    pad1;
     // Here lies the rub for all
@@ -414,6 +416,7 @@ typedef struct
     // See above.
     byte    bottom[SCREENWIDTH];
     byte    pad4;
-} visplane_t;
+};
+typedef struct visplane_s    visplane_t;
 
 #endif

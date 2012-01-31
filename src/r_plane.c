@@ -46,11 +46,18 @@ planefunction_t    ceilingfunc;
 //
 
 // Here comes the obnoxious "visplane".
-#define MAXVISPLANES    128
-visplane_t    visplanes[MAXVISPLANES];
-visplane_t    *lastvisplane;
+#define MAXVISPLANES    128    // Must be a power of two
+// JoshK: Visplanes hash table. From PRBoom. By Lee Killough.
+static visplane_t    *visplanes[MAXVISPLANES];
+static visplane_t    *freetail;
+static visplane_t    **freehead = &freetail;
+
 visplane_t    *floorplane;
 visplane_t    *ceilingplane;
+
+// JoshK: Hash function for visplanes. From PRBoom. By Lee Killough.
+#define visplane_hash(picnum, lightlevel, height) \
+  ((uint32_t)((picnum) * 3 + (lightlevel) + (height) * 7) & (MAXVISPLANES - 1))
 
 // ?
 #define MAXOPENINGS    SCREENWIDTH * 64
@@ -70,7 +77,7 @@ int16_t    ceilingclip[SCREENWIDTH];
 // initialized to 0 at start
 //
 int32_t    spanstart[SCREENHEIGHT];
-int32_t    spanstop[SCREENHEIGHT];
+//int32_t    spanstop[SCREENHEIGHT];
 
 //
 // texture mapping
@@ -184,7 +191,15 @@ void R_ClearPlanes(void)
         ceilingclip[i] = -1;
     }
 
-    lastvisplane = visplanes;
+    // JoshK: Clear visplanes hash table. From PRBoom. By Lee Killough
+    for (i=0; i<MAXVISPLANES; ++i)
+    {
+        for (*freehead=visplanes[i], visplanes[i] = NULL; *freehead; )
+        {
+            freehead = &(*freehead)->next;
+        }
+    }
+
     lastopening = openings;
 
     // texture calculation
@@ -198,12 +213,32 @@ void R_ClearPlanes(void)
     baseyscale = -FixedDiv(finesine[angle], centerxfrac);
 }
 
+// JoshK: New function for making a new visplane. From PRBoom. By Lee Killough
+static visplane_t *new_visplane(uint32_t hash)
+{
+    visplane_t   *check = freetail;
+
+    if (check == NULL)
+    {
+        check = (visplane_t *)calloc(1, sizeof(*check));
+    }
+    else if ((freetail = freetail->next) == NULL)
+    {
+        freehead = &freetail;
+    }
+    check->next = visplanes[hash];
+    visplanes[hash] = check;
+
+    return check;
+}
+
 //
 // R_FindPlane
 //
 visplane_t *R_FindPlane(fixed_t height, int32_t picnum, int32_t lightlevel)
 {
     visplane_t    *check;
+    uint32_t      hash;
 
     if (picnum == skyflatnum)
     {
@@ -211,32 +246,25 @@ visplane_t *R_FindPlane(fixed_t height, int32_t picnum, int32_t lightlevel)
         lightlevel = 0;
     }
 
-    for (check=visplanes; check<lastvisplane; check++)
+    // JoshK: New visplane search algorithm. From PRBoom. By Lee Killough
+    hash = visplane_hash(picnum, lightlevel, height);
+    for (check=visplanes[hash]; check; check=check->next)
     {
         if (height == check->height
          && picnum == check->picnum
          && lightlevel == check->lightlevel)
         {
-            break;
+            return check;
         }
     }
 
-    if (check < lastvisplane)
-    {
-        return check;
-    }
-
-    if (lastvisplane - visplanes == MAXVISPLANES)
-    {
-        I_Error("R_FindPlane: no more visplanes");
-    }
-
-    lastvisplane++;
+    // JoshK: new visplane
+    check = new_visplane(hash);
 
     check->height = height;
     check->picnum = picnum;
     check->lightlevel = lightlevel;
-    check->minx = SCREENWIDTH;
+    check->minx = viewwidth; // JoshK: PRBoom uses viewwidth, not SCREENWIDTH
     check->maxx = -1;
 
     memset(check->top, 0xff, sizeof(check->top));
@@ -287,23 +315,29 @@ visplane_t *R_CheckPlane(visplane_t *pl, int32_t start, int32_t stop)
 
     if (x > intrh)
     {
+        // use the same one
         pl->minx = unionl;
         pl->maxx = unionh;
-
-        // use the same one
-        return pl;
     }
+    else
+    {
+        // JoshK:
+        // Make a new visplane. From ZDoom.
+        uint32_t      hash;
+        visplane_t    *new_pl = NULL;
 
-    // make a new visplane
-    lastvisplane->height = pl->height;
-    lastvisplane->picnum = pl->picnum;
-    lastvisplane->lightlevel = pl->lightlevel;
+        hash = visplane_hash(pl->picnum, pl->lightlevel, pl->height);
+        new_pl = new_visplane(hash);
+        new_pl->height = pl->height;
+        new_pl->picnum = pl->picnum;
+        new_pl->lightlevel = pl->lightlevel;
 
-    pl = lastvisplane++;
-    pl->minx = start;
-    pl->maxx = stop;
+        pl = new_pl;
+        pl->minx = start;
+        pl->maxx = stop;
 
-    memset(pl->top, 0xff, sizeof(pl->top));
+        memset(pl->top, 0xff, sizeof(pl->top));
+    }
 
     return pl;
 }
@@ -348,17 +382,12 @@ void R_DrawPlanes(void)
     int32_t       stop;
     int32_t       angle;
     int32_t       lumpnum;
+    uint32_t      i;
 
 #ifdef RANGECHECK
     if (ds_p - drawsegs > MAXDRAWSEGS)
     {
         I_Error("R_DrawPlanes: drawsegs overflow (%i)", ds_p - drawsegs);
-    }
-
-    if (lastvisplane - visplanes > MAXVISPLANES)
-    {
-        I_Error("R_DrawPlanes: visplane overflow (%i)",
-                lastvisplane - visplanes);
     }
 
     if (lastopening - openings > MAXOPENINGS)
@@ -368,7 +397,10 @@ void R_DrawPlanes(void)
     }
 #endif
 
-    for (pl=visplanes; pl<lastvisplane; pl++)
+    // JoshK: New visplanes draw loop.
+    for (i=0; i<MAXVISPLANES; ++i)
+    {
+    for (pl=visplanes[i]; pl; pl=pl->next)
     {
         if (pl->minx > pl->maxx)
         {
@@ -434,5 +466,6 @@ void R_DrawPlanes(void)
         }
 
         W_ReleaseLumpNum(lumpnum);
+    }
     }
 }
