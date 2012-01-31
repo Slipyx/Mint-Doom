@@ -1112,8 +1112,9 @@ hitline:
 
             // it's a sky hack wall
             if (li->backsector && li->backsector->ceilingpic == skyflatnum
-             // JoshK: Outdoor bullet puffs bug fix (partially)
-             && li->backsector->ceilingheight < z)
+             // JoshK: Outdoor bullet puffs bug fix (Not in demos)
+             && ((demorecording || demoplayback)
+              || li->backsector->ceilingheight < z))
             {
                 return false;
             }

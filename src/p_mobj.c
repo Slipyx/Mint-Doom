@@ -594,16 +594,12 @@ void P_RemoveMobj (mobj_t* mobj)
 	
     // unlink from sector and block lists
     P_UnsetThingPosition (mobj);
-    
-    // stop any playing sound
-    S_StopSound (mobj);
-    
+
+    // JoshK: Don't stop sound on object removal
+
     // free block
     P_RemoveThinker ((thinker_t*)mobj);
 }
-
-
-
 
 //
 // P_RespawnSpecials
