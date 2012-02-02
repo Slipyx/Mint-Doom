@@ -143,7 +143,7 @@ void ConfigMouse(void)
 
     TXT_AddWidgets(motion_table,
                    TXT_NewLabel("Speed"),
-                   TXT_NewSpinControl(&mouseSensitivity, 1, 256),
+                   TXT_NewSpinControl(&mouseSensitivity, 1, 30),
                    TXT_NewLabel("Acceleration"),
                    TXT_NewFloatSpinControl(&mouse_acceleration, 1.0, 5.0),
                    TXT_NewLabel("Acceleration threshold"),

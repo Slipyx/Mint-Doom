@@ -894,8 +894,8 @@ void D_DoomMain(void)
 
     PrintBanner(PACKAGE_STRING);
 
-    DEH_printf("Z_Init: Init zone memory allocation daemon. \n");
-    Z_Init();
+    //DEH_printf("Z_Init: Init zone memory allocation daemon. \n");
+    //Z_Init();
 
 #ifdef FEATURE_MULTIPLAYER
     //!

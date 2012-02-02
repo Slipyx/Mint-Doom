@@ -1021,7 +1021,7 @@ void M_DrawOptions(void)
                        PU_CACHE));
 
     M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(mousesens+1),
-         10,mouseSensitivity);
+         30,mouseSensitivity);
 
     M_DrawThermo(OptionsDef.x,OptionsDef.y+LINEHEIGHT*(scrnsize+1),
          9,screenSize);
@@ -1209,7 +1209,7 @@ void M_ChangeSensitivity(int choice)
         mouseSensitivity--;
     break;
       case 1:
-    if (mouseSensitivity < 9)
+    if (mouseSensitivity < 30)
         mouseSensitivity++;
     break;
     }
