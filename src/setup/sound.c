@@ -40,7 +40,6 @@ typedef enum
 typedef enum
 {
     MUSMODE_DISABLED,
-    MUSMODE_OPL,
     MUSMODE_NATIVE,
     NUM_MUSMODES
 } musmode_t;
@@ -55,7 +54,6 @@ static char    *sfxmode_strings[] =
 static char    *musmode_strings[] =
 {
     "Disabled",
-    "OPL (Adlib/SB)",
     "Native MIDI"
 };
 
@@ -67,7 +65,6 @@ int32_t    snd_musicdevice = SNDDEVICE_GENMIDI;
 int32_t    musicVolume = 8;
 
 int32_t    snd_samplerate = 44100;
-int32_t    opl_io_port = 0x388;
 
 int32_t    use_libsamplerate = 0;
 
@@ -93,9 +90,6 @@ static void UpdateSndDevices(TXT_UNCAST_ARG(widget), TXT_UNCAST_ARG(data))
     {
         case MUSMODE_DISABLED:
             snd_musicdevice = SNDDEVICE_NONE;
-            break;
-        case MUSMODE_OPL:
-            snd_musicdevice = SNDDEVICE_SB;
             break;
         case MUSMODE_NATIVE:
             snd_musicdevice = SNDDEVICE_GENMIDI;
@@ -127,12 +121,6 @@ void ConfigSound(void)
     if (snd_musicdevice == SNDDEVICE_GENMIDI)
     {
         snd_musmode = MUSMODE_NATIVE;
-    }
-    else if (snd_musicdevice == SNDDEVICE_SB
-          || snd_musicdevice == SNDDEVICE_ADLIB
-          || snd_musicdevice == SNDDEVICE_AWE32)
-    {
-        snd_musmode = MUSMODE_OPL;
     }
     else
     {

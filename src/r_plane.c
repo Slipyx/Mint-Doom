@@ -117,7 +117,7 @@ void R_InitPlanes(void)
 //
 // BASIC PRIMITIVE
 //
-void R_MapPlane(int32_t y, int32_t x1, int32_t x2)
+static void R_MapPlane(int32_t y, int32_t x1, int32_t x2)
 {
     angle_t     angle;
     fixed_t     distance;
@@ -151,11 +151,7 @@ void R_MapPlane(int32_t y, int32_t x1, int32_t x2)
     ds_xfrac = viewx + FixedMul(finecosine[angle], length);
     ds_yfrac = -viewy - FixedMul(finesine[angle], length);
 
-    if (fixedcolormap)
-    {
-        ds_colormap = fixedcolormap;
-    }
-    else
+    if (!fixedcolormap)
     {
         index = distance >> LIGHTZSHIFT;
 
@@ -165,6 +161,10 @@ void R_MapPlane(int32_t y, int32_t x1, int32_t x2)
         }
 
         ds_colormap = planezlight[index];
+    }
+    else
+    {
+        ds_colormap = fixedcolormap;
     }
 
     ds_y = y;
@@ -182,7 +182,7 @@ void R_MapPlane(int32_t y, int32_t x1, int32_t x2)
 void R_ClearPlanes(void)
 {
     int32_t    i;
-    angle_t    angle;
+    //angle_t    angle;
 
     // opening / clipping determination
     for (i=0; i<viewwidth; i++)
@@ -194,7 +194,7 @@ void R_ClearPlanes(void)
     // JoshK: Clear visplanes hash table. From PRBoom. By Lee Killough
     for (i=0; i<MAXVISPLANES; ++i)
     {
-        for (*freehead=visplanes[i], visplanes[i] = NULL; *freehead; )
+        for (*freehead=visplanes[i], visplanes[i]=NULL; *freehead; )
         {
             freehead = &(*freehead)->next;
         }
@@ -206,11 +206,12 @@ void R_ClearPlanes(void)
     memset(cachedheight, 0, sizeof(cachedheight));
 
     // left to right mapping
-    angle = (viewangle - ANG90) >> ANGLETOFINESHIFT;
+    //angle = (viewangle - ANG90) >> ANGLETOFINESHIFT;
 
+    // JoshK: from prboom :D
     // scale will be unit scale at SCREENWIDTH/2 distance
-    basexscale = FixedDiv(finecosine[angle], centerxfrac);
-    baseyscale = -FixedDiv(finesine[angle], centerxfrac);
+    basexscale = FixedDiv(viewsin, projection);
+    baseyscale = FixedDiv(viewcos, projection);
 }
 
 // JoshK: New function for making a new visplane. From PRBoom. By Lee Killough
@@ -220,7 +221,7 @@ static visplane_t *new_visplane(uint32_t hash)
 
     if (check == NULL)
     {
-        check = (visplane_t *)calloc(1, sizeof(*check));
+        check = (visplane_t *)Z_Calloc(1, sizeof(*check), PU_STATIC, NULL);
     }
     else if ((freetail = freetail->next) == NULL)
     {
@@ -242,8 +243,7 @@ visplane_t *R_FindPlane(fixed_t height, int32_t picnum, int32_t lightlevel)
 
     if (picnum == skyflatnum)
     {
-        height = 0;    // all skys map together
-        lightlevel = 0;
+        height = lightlevel = 0; // all skys map together
     }
 
     // JoshK: New visplane search algorithm. From PRBoom. By Lee Killough
@@ -277,11 +277,7 @@ visplane_t *R_FindPlane(fixed_t height, int32_t picnum, int32_t lightlevel)
 //
 visplane_t *R_CheckPlane(visplane_t *pl, int32_t start, int32_t stop)
 {
-    int32_t    intrl;
-    int32_t    intrh;
-    int32_t    unionl;
-    int32_t    unionh;
-    int32_t    x;
+    int32_t    intrl, intrh, unionl, unionh, x;
 
     if (start < pl->minx)
     {
@@ -305,19 +301,17 @@ visplane_t *R_CheckPlane(visplane_t *pl, int32_t start, int32_t stop)
         intrh = stop;
     }
 
-    for (x=intrl; x<=intrh; x++)
+    // JoshK: Dropoff overflow from PRBoom
+    for (x=intrl; x<=intrh && pl->top[x]==0xffu; x++)
     {
-        if (pl->top[x] != 0xff)
-        {
-            break;
-        }
+        ;
     }
 
     if (x > intrh)
     {
         // use the same one
-        pl->minx = unionl;
-        pl->maxx = unionh;
+        pl->minx = unionl; pl->maxx = unionh;
+        return pl;
     }
     else
     {
@@ -337,36 +331,32 @@ visplane_t *R_CheckPlane(visplane_t *pl, int32_t start, int32_t stop)
         pl->maxx = stop;
 
         memset(pl->top, 0xff, sizeof(pl->top));
+        return pl;
     }
-
-    return pl;
 }
 
 //
 // R_MakeSpans
 //
-void R_MakeSpans(int32_t x, int32_t t1, int32_t b1, int32_t t2, int32_t b2)
+// JoshK: Ported from PRBoom
+//
+static void R_MakeSpans(int32_t x, int32_t t1, int32_t b1, int32_t t2, int32_t b2)
 {
-    while (t1 < t2 && t1 <= b1)
+    for (; t1<t2 && t1<=b1; ++t1)
     {
         R_MapPlane(t1, spanstart[t1], x - 1);
-        t1++;
     }
-    while (b1 > b2 && b1 >= t1)
+    for (; b1>b2 && b1>=t1; --b1)
     {
         R_MapPlane(b1, spanstart[b1], x - 1);
-        b1--;
     }
-
     while (t2 < t1 && t2 <= b2)
     {
-        spanstart[t2] = x;
-        t2++;
+        spanstart[t2++] = x;
     }
     while (b2 > b1 && b2 >= t2)
     {
-        spanstart[b2] = x;
-        b2--;
+        spanstart[b2--] = x;
     }
 }
 
@@ -452,12 +442,10 @@ void R_DrawPlanes(void)
             light = 0;
         }
 
-        planezlight = zlight[light];
-
-        pl->top[pl->maxx + 1] = 0xff;
-        pl->top[pl->minx - 1] = 0xff;
-
+        // JoshK: Dropoff overflow from PRBoom
         stop = pl->maxx + 1;
+        planezlight = zlight[light];
+        pl->top[pl->minx - 1] = pl->top[stop] = 0xffu;
 
         for (x=pl->minx; x<=stop; x++)
         {

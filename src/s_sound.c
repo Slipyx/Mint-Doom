@@ -127,7 +127,6 @@ int32_t    snd_sfxdevice = SNDDEVICE_SB;
 extern sound_module_t    sound_sdl_module;
 extern sound_module_t    sound_pcsound_module;
 extern music_module_t    music_sdl_module;
-extern music_module_t    music_opl_module;
 
 // Compiled-in sound modules:
 
@@ -146,7 +145,6 @@ static music_module_t    *music_modules[] =
 {
 #ifdef FEATURE_SOUND
     &music_sdl_module,
-    &music_opl_module,
 #endif
     NULL,
 };

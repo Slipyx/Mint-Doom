@@ -45,7 +45,6 @@ extern int32_t    snd_musicdevice;
 extern int32_t    musicVolume;
 
 extern int32_t    snd_samplerate;
-extern int32_t    opl_io_port;
 
 extern int32_t    use_libsamplerate;
 

@@ -152,7 +152,6 @@ static int usegamma = 0;
 static int snd_sbport = 0;
 static int snd_sbirq = 0;
 static int snd_sbdma = 0;
-static int snd_mport = 0;
 
 typedef enum
 {
@@ -233,7 +232,6 @@ static default_t doom_defaults_list[] =
     {"snd_sbport", &snd_sbport, DEFAULT_INT, 0, 0},
     {"snd_sbirq", &snd_sbirq, DEFAULT_INT, 0, 0},
     {"snd_sbdma", &snd_sbdma, DEFAULT_INT, 0, 0},
-    {"snd_mport", &snd_mport, DEFAULT_INT, 0, 0},
 
     {"usegamma", &usegamma, DEFAULT_INT, 0, 0},
 
@@ -271,7 +269,6 @@ static default_t extra_defaults_list[] =
     {"mouse_acceleration",          &mouse_acceleration, DEFAULT_FLOAT, 0, 0},
     {"mouse_threshold",             &mouse_threshold, DEFAULT_INT, 0, 0},
     {"snd_samplerate",              &snd_samplerate, DEFAULT_INT, 0, 0},
-    {"opl_io_port",                 &opl_io_port, DEFAULT_INT_HEX, 0, 0},
     {"show_endoom",                 &show_endoom, DEFAULT_INT, 0, 0},
     {"vanilla_savegame_limit",      &vanilla_savegame_limit, DEFAULT_INT, 0, 0},
     {"vanilla_demo_limit",          &vanilla_demo_limit, DEFAULT_INT, 0, 0},

@@ -1,8 +1,12 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
-// Copyright(C) 1993-1996 Id Software, Inc.
-// Copyright(C) 2005 Simon Howard
+// Copyright (C) 1999 by
+// id Software, Chi Hoang, Lee Killough, Jim Flynn, Rand Phares, Ty Halderman
+// Copyright (C) 1999-2000 by
+// Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
+// Copyright 2005, 2006 by
+// Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,61 +24,70 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//      Zone Memory Allocation, perhaps NeXT ObjectiveC inspired.
-//	Remark: this was the only stuff that, according
-//	 to John Carmack, might have been useful for
-//	 Quake.
+//     Zone Memory Allocation, perhaps NeXT ObjectiveC inspired.
+//     Remark: this was the only stuff that, according
+//      to John Carmack, might have been useful for
+//      Quake.
+//
+// JoshK: Ported from PrBoom, sans INSTRUMENTED. Rewritten by Lee Killough.
 //
 //---------------------------------------------------------------------
-
-
 
 #ifndef __Z_ZONE__
 #define __Z_ZONE__
 
+// Include system definitions so that prototypes become
+// active before macro replacements below are in effect.
+
+#include "doomtype.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 
 //
 // ZONE MEMORY
 // PU - purge tags.
-
+//
 enum
 {
-    PU_STATIC = 1,                  // static entire execution time
-    PU_SOUND,                       // static while playing
-    PU_MUSIC,                       // static while playing
-    PU_FREE,                        // a free block
-    PU_LEVEL,                       // static until level exited
-    PU_LEVSPEC,                     // a special thinker in a level
-    
-    // Tags >= PU_PURGELEVEL are purgable whenever needed.
+    PU_FREE,       // a free block
+    PU_STATIC,     // static entire execution time
+    PU_SOUND,      // static while playing
+    PU_MUSIC,      // static while playing
+    PU_LEVEL,      // static until level exited
+    PU_LEVSPEC,    // a special thinker in a level
 
-    PU_PURGELEVEL,
     PU_CACHE,
-
-    // Total number of different tag types
-
-    PU_NUM_TAGS
+    PU_MAX,    // Must always be last -- killough
 };
-        
 
-void	Z_Init (void);
-void*	Z_Malloc (int size, int tag, void *ptr);
-void    Z_Free (void *ptr);
-void    Z_FreeTags (int lowtag, int hightag);
-void    Z_DumpHeap (int lowtag, int hightag);
-void    Z_FileDumpHeap (FILE *f);
-void    Z_CheckHeap (void);
-void    Z_ChangeTag2 (void *ptr, int tag, char *file, int line);
-int     Z_FreeMemory (void);
-unsigned int Z_ZoneSize(void);
+#define PU_PURGELEVEL    PU_CACHE    // First purgable tag's level
 
-//
-// This is used to get the local FILE:LINE info from CPP
-// prior to really call the function in question.
-//
-#define Z_ChangeTag(p,t)                                       \
-    Z_ChangeTag2((p), (t), __FILE__, __LINE__)
+void *Z_Malloc(size_t size, int32_t tag, void **ptr);
+void Z_Free(void *ptr);
+void Z_FreeTags(int32_t lowtag, int32_t hightag);
+void Z_ChangeTag(void *ptr, int32_t tag);
+void Z_Init(void);
+void Z_Close(void);
+void *Z_Calloc(size_t n1, size_t n2, int32_t tag, void **user);
+void *Z_Realloc(void *ptr, size_t n, int32_t tag, void **user);
+char *Z_Strdup(const char *s, int32_t tag, void **user);
+void Z_CheckHeap(void);
 
+// Remove all definitions before including system definitions
+/*
+#undef malloc
+#undef free
+#undef realloc
+#undef calloc
+#undef strdup
+
+#define malloc(n)         Z_Malloc(n, PU_STATIC, NULL)
+#define free(p)           Z_Free(p)
+#define realloc(p, n)     Z_Realloc(p, n, PU_STATIC, NULL)
+#define calloc(n1, n2)    Z_Calloc(n1, n2, PU_STATIC, NULL)
+#define strdup(s)         Z_Strdup(s, PU_STATIC, NULL)
+*/
 
 #endif

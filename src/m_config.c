@@ -200,7 +200,6 @@ extern int      vanilla_demo_limit;
 extern int snd_musicdevice;
 extern int snd_sfxdevice;
 extern int snd_samplerate;
-extern int opl_io_port;
 
 // controls whether to use libsamplerate for sample rate conversions
 
@@ -213,7 +212,6 @@ extern int use_libsamplerate;
 static int snd_sbport = 0;
 static int snd_sbirq = 0;
 static int snd_sbdma = 0;
-static int snd_mport = 0;
 
 typedef enum 
 {
@@ -481,12 +479,6 @@ static default_t	doom_defaults_list[] =
     CONFIG_VARIABLE_INT(snd_sbdma,         snd_sbdma),
 
     //!
-    // Output port to use for OPL MIDI playback.  Unused.
-    //
-
-    CONFIG_VARIABLE_INT(snd_mport,         snd_mport),
-
-    //!
     // Gamma correction level.  A value of zero disables gamma 
     // correction, while a value in the range 1-4 gives increasing
     // levels of gamma correction.
@@ -659,13 +651,6 @@ static default_t extra_defaults_list[] =
     //
 
     CONFIG_VARIABLE_INT(snd_samplerate,            snd_samplerate),
-
-    //!
-    // The I/O port to use to access the OPL chip.  Only relevant when
-    // using native OPL music playback.
-    //
-
-    CONFIG_VARIABLE_INT_HEX(opl_io_port,           opl_io_port),
 
     //!
     // If non-zero, the ENDOOM screen is displayed when exiting the

@@ -1,8 +1,12 @@
-// Emacs style mode select   -*- C++ -*- 
+// Emacs style mode select   -*- C++ -*-
 //-----------------------------------------------------------------------------
 //
-// Copyright(C) 1993-1996 Id Software, Inc.
-// Copyright(C) 2005 Simon Howard
+//  Copyright (C) 1999 by
+//  id Software, Chi Hoang, Lee Killough, Jim Flynn, Rand Phares, Ty Halderman
+//  Copyright (C) 1999-2000 by
+//  Jess Haas, Nicolas Kalkhof, Colin Phipps, Florian Schulze
+//  Copyright 2005, 2006 by
+//  Florian Schulze, Colin Phipps, Neil Stevens, Andrey Budko
 //
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -20,462 +24,299 @@
 // 02111-1307, USA.
 //
 // DESCRIPTION:
-//	Zone Memory Allocation. Neat.
+//     Zone Memory Allocation. Neat.
+//
+// JoshK: Ported from PrBoom, sans INSTRUMENTED.
+// Neat enough to be rewritten by Lee Killough...
+//
+// Must not have been real neat :)
+//
+// Made faster and more general, and added wrappers for all of Doom's
+// memory allocation functions, including malloc() and similar functions.
+// Added line and file numbers, in case of error. Added performance
+// statistics and tunables.
 //
 //-----------------------------------------------------------------------------
 
-
 #include "z_zone.h"
 #include "i_system.h"
-#include "doomdef.h"
 
+// Tunables
 
-//
-// ZONE MEMORY ALLOCATION
-//
-// There is never any space between memblocks,
-//  and there will never be two contiguous free memblocks.
-// The rover can be left pointing at a non-empty block.
-//
-// It is of no value to free a cachable block,
-//  because it will get overwritten automatically if needed.
-// 
- 
-#define MEM_ALIGN sizeof(void *)
-#define ZONEID	0x1d4a11
+// Alignment of zone memory (benefit may be negated by HEADER_SIZE, CHUNK_SIZE)
+#define CACHE_ALIGN    32
 
-typedef struct memblock_s
+// Minimum chunk size at which blocks are allocated
+#define CHUNK_SIZE    32
+
+// Minimum size a block must be to become part of a split
+#define MIN_BLOCK_SPLIT    (1024)
+
+// How much RAM to leave aside for other libraries
+#define LEAVE_ASIDE    (128 * 1024)
+
+// Amount to subtract when retrying failed attempts to allocate initial pool
+#define RETRY_AMOUNT    (256 * 1024)
+
+// signature for block header
+#define ZONEID    0x931d4a11
+
+// Number of mallocs & frees kept in history buffer (must be a power of 2)
+#define ZONE_HISTORY    4
+
+// End Tunables
+
+typedef struct memblock
 {
-    int			size;	// including the header and possibly tiny fragments
-    void**		user;
-    int			tag;	// PU_FREE if this is free
-    int			id;	// should be ZONEID
-    struct memblock_s*	next;
-    struct memblock_s*	prev;
+    struct memblock    *next, *prev;
+    size_t    size;
+    void    **user;
+    uint8_t    tag;
 } memblock_t;
 
-
-typedef struct
-{
-    // total bytes malloced, including header
-    int		size;
-
-    // start / end cap for linked list
-    memblock_t	blocklist;
-    
-    memblock_t*	rover;
-    
-} memzone_t;
-
-
-
-memzone_t*	mainzone;
-
-
-
 //
-// Z_ClearZone
+// size of block header
+// cph - base on sizeof(memblock_t), which can be larger than CHUNK_SIZE on
+// 64bit architectures
 //
-void Z_ClearZone (memzone_t* zone)
-{
-    memblock_t*		block;
-	
-    // set the entire zone to one free block
-    zone->blocklist.next =
-	zone->blocklist.prev =
-	block = (memblock_t *)( (byte *)zone + sizeof(memzone_t) );
-    
-    zone->blocklist.user = (void *)zone;
-    zone->blocklist.tag = PU_STATIC;
-    zone->rover = block;
-	
-    block->prev = block->next = &zone->blocklist;
-    
-    // a free block.
-    block->tag = PU_FREE;
+static const size_t    HEADER_SIZE = (sizeof(memblock_t) + CHUNK_SIZE - 1)
+                                   & ~(CHUNK_SIZE - 1);
 
-    block->size = zone->size - sizeof(memzone_t);
+static memblock_t    *blockbytag[PU_MAX];
+
+// 0 means unlimited, any other value is a hard limit
+//static int32_t    memory_size = 8192 * 1024;
+static int32_t    memory_size = 0;
+static int32_t    free_memory = 0;
+
+void Z_DumpHistory(char *buf)
+{
 }
 
-
-
-//
-// Z_Init
-//
-void Z_Init (void)
+void Z_Close(void)
 {
-    memblock_t*	block;
-    int		size;
-
-    mainzone = (memzone_t *)I_ZoneBase (&size);
-    mainzone->size = size;
-
-    // set the entire zone to one free block
-    mainzone->blocklist.next =
-	mainzone->blocklist.prev =
-	block = (memblock_t *)( (byte *)mainzone + sizeof(memzone_t) );
-
-    mainzone->blocklist.user = (void *)mainzone;
-    mainzone->blocklist.tag = PU_STATIC;
-    mainzone->rover = block;
-	
-    block->prev = block->next = &mainzone->blocklist;
-
-    // free block
-    block->tag = PU_FREE;
-    
-    block->size = mainzone->size - sizeof(memzone_t);
 }
 
-
-//
-// Z_Free
-//
-void Z_Free (void* ptr)
+void Z_Init(void)
 {
-    memblock_t*		block;
-    memblock_t*		other;
-	
-    block = (memblock_t *) ( (byte *)ptr - sizeof(memblock_t));
-
-    if (block->id != ZONEID)
-	I_Error ("Z_Free: freed a pointer without ZONEID");
-		
-    if (block->tag != PU_FREE && block->user != NULL)
-    {
-    	// clear the user's mark
-	    *block->user = 0;
-    }
-
-    // mark as free
-    block->tag = PU_FREE;
-    block->user = NULL;
-    block->id = 0;
-	
-    other = block->prev;
-
-    if (other->tag == PU_FREE)
-    {
-        // merge with previous free block
-        other->size += block->size;
-        other->next = block->next;
-        other->next->prev = other;
-
-        if (block == mainzone->rover)
-            mainzone->rover = other;
-
-        block = other;
-    }
-	
-    other = block->next;
-    if (other->tag == PU_FREE)
-    {
-        // merge the next free block onto the end
-        block->size += other->size;
-        block->next = other->next;
-        block->next->prev = block;
-
-        if (other == mainzone->rover)
-            mainzone->rover = block;
-    }
 }
-
-
 
 //
 // Z_Malloc
 // You can pass a NULL user if the tag is < PU_PURGELEVEL.
 //
-#define MINFRAGMENT		64
-
-
-void*
-Z_Malloc
-( int		size,
-  int		tag,
-  void*		user )
+// cph - the algorithm here was a very simple first-fit round-robin
+//  one - just keep looping around, freeing everything we can until
+//  we get a large enough space
+//
+// This has been changed now; we still do the round-robin first-fit,
+// but we only free the blocks we actually end up using; we don't
+// free all the stuff we just pass on the way.
+//
+void *Z_Malloc(size_t size, int32_t tag, void **user)
 {
-    int		extra;
-    memblock_t*	start;
-    memblock_t* rover;
-    memblock_t* newblock;
-    memblock_t*	base;
-    void *result;
+    memblock_t    *block = NULL;
 
-    size = (size + MEM_ALIGN - 1) & ~(MEM_ALIGN - 1);
-    
-    // scan through the block list,
-    // looking for the first free block
-    // of sufficient size,
-    // throwing out any purgable blocks along the way.
-
-    // account for size of block header
-    size += sizeof(memblock_t);
-    
-    // if there is a free block behind the rover,
-    //  back up over them
-    base = mainzone->rover;
-    
-    if (base->prev->tag == PU_FREE)
-        base = base->prev;
-	
-    rover = base;
-    start = base->prev;
-	
-    do
+    if (!size)
     {
-        if (rover == start)
-        {
-            // scanned all the way around the list
-            I_Error ("Z_Malloc: failed on allocation of %i bytes", size);
-        }
-	
-        if (rover->tag != PU_FREE)
-        {
-            if (rover->tag < PU_PURGELEVEL)
-            {
-                // hit a block that can't be purged,
-                // so move base past it
-                base = rover = rover->next;
-            }
-            else
-            {
-                // free the rover block (adding the size to base)
+        return user ? *user = NULL : NULL; // malloc(0) returns NULL
+    }
 
-                // the rover can be the base block
-                base = base->prev;
-                Z_Free ((byte *)rover+sizeof(memblock_t));
-                base = base->next;
-                rover = base->next;
+    size = (size + CHUNK_SIZE - 1) & ~(CHUNK_SIZE - 1); // round to chunk size
+
+    if (memory_size > 0
+     && ((free_memory + memory_size) < (int32_t)(size + HEADER_SIZE)))
+    {
+        memblock_t    *end_block;
+        block = blockbytag[PU_CACHE];
+        if (block)
+        {
+            end_block = block->prev;
+            while (1)
+            {
+                memblock_t    *next = block->next;
+                Z_Free((char *)block + HEADER_SIZE);
+                if (((free_memory + memory_size)
+                 >= (int32_t)(size + HEADER_SIZE)) || (block == end_block))
+                {
+                    break;
+                }
+                block = next; // Advance to next block
             }
         }
-        else
+        block = NULL;
+    }
+
+    while (!(block = (memblock_t *)malloc(size + HEADER_SIZE)))
+    {
+        if (!blockbytag[PU_CACHE])
         {
-            rover = rover->next;
+            I_Error("Z_Malloc: Failure trying to allocate %lu bytes",
+                    (uint32_t)size);
         }
-
-    } while (base->tag != PU_FREE || base->size < size);
-
-    
-    // found a block big enough
-    extra = base->size - size;
-    
-    if (extra >  MINFRAGMENT)
-    {
-        // there will be a free fragment after the allocated block
-        newblock = (memblock_t *) ((byte *)base + size );
-        newblock->size = extra;
-	
-        newblock->tag = PU_FREE;
-        newblock->user = NULL;	
-        newblock->prev = base;
-        newblock->next = base->next;
-        newblock->next->prev = newblock;
-
-        base->next = newblock;
-        base->size = size;
-    }
-	
-	if (user == NULL && tag >= PU_PURGELEVEL)
-	    I_Error ("Z_Malloc: an owner is required for purgable blocks");
-
-    base->user = user;
-    base->tag = tag;
-
-    result  = (void *) ((byte *)base + sizeof(memblock_t));
-
-    if (base->user)
-    {
-        *base->user = result;
+        Z_FreeTags(PU_CACHE, PU_CACHE);
     }
 
-    // next allocation will start looking here
-    mainzone->rover = base->next;	
-	
-    base->id = ZONEID;
-    
-    return result;
+    if (!blockbytag[tag])
+    {
+        blockbytag[tag] = block;
+        block->next = block->prev = block;
+    }
+    else
+    {
+        blockbytag[tag]->prev->next = block;
+        block->prev = blockbytag[tag]->prev;
+        block->next = blockbytag[tag];
+        blockbytag[tag]->prev = block;
+    }
+
+    block->size = size;
+
+    free_memory -= block->size;
+
+    block->tag = tag; // tag
+    block->user = user; // user
+    block = (memblock_t *)((char *)block + HEADER_SIZE);
+    if (user) // if there is a user
+    {
+        *user = block; // set user to point to new block
+    }
+
+    return block;
 }
 
-
-
-//
-// Z_FreeTags
-//
-void
-Z_FreeTags
-( int		lowtag,
-  int		hightag )
+void Z_Free(void *p)
 {
-    memblock_t*	block;
-    memblock_t*	next;
-	
-    for (block = mainzone->blocklist.next ;
-	 block != &mainzone->blocklist ;
-	 block = next)
-    {
-	// get link before freeing
-	next = block->next;
+    memblock_t    *block = (memblock_t *)((char *)p - HEADER_SIZE);
 
-	// free block?
-	if (block->tag == PU_FREE)
-	    continue;
-	
-	if (block->tag >= lowtag && block->tag <= hightag)
-	    Z_Free ( (byte *)block+sizeof(memblock_t));
+    if (!p)
+    {
+        return;
     }
+
+    if (block->user) // Nullify user if one exists
+    {
+        *block->user = NULL;
+    }
+
+    if (block == block->next)
+    {
+        blockbytag[block->tag] = NULL;
+    }
+    else if (blockbytag[block->tag] == block)
+    {
+        blockbytag[block->tag] = block->next;
+    }
+    block->prev->next = block->next;
+    block->next->prev = block->prev;
+
+    free_memory += block->size;
+
+    free(block);
 }
 
-
-
-//
-// Z_DumpHeap
-// Note: TFileDumpHeap( stdout ) ?
-//
-void
-Z_DumpHeap
-( int		lowtag,
-  int		hightag )
+void Z_FreeTags(int32_t lowtag, int32_t hightag)
 {
-    memblock_t*	block;
-	
-    printf ("zone size: %i  location: %p\n",
-	    mainzone->size,mainzone);
-    
-    printf ("tag range: %i to %i\n",
-	    lowtag, hightag);
-	
-    for (block = mainzone->blocklist.next ; ; block = block->next)
+    if (lowtag <= PU_FREE)
     {
-	if (block->tag >= lowtag && block->tag <= hightag)
-	    printf ("block:%p    size:%7i    user:%p    tag:%3i\n",
-		    block, block->size, block->user, block->tag);
-		
-	if (block->next == &mainzone->blocklist)
-	{
-	    // all blocks have been hit
-	    break;
-	}
-	
-	if ( (byte *)block + block->size != (byte *)block->next)
-	    printf ("ERROR: block size does not touch the next block\n");
+        lowtag = PU_FREE + 1;
+    }
+    if (hightag > PU_CACHE)
+    {
+        hightag = PU_CACHE;
+    }
 
-	if ( block->next->prev != block)
-	    printf ("ERROR: next block doesn't have proper back link\n");
-
-	if (block->tag == PU_FREE && block->next->tag == PU_FREE)
-	    printf ("ERROR: two consecutive free blocks\n");
+    for (; lowtag<=hightag; ++lowtag)
+    {
+        memblock_t    *block, *end_block;
+        block = blockbytag[lowtag];
+        if (!block)
+        {
+            continue;
+        }
+        end_block = block->prev;
+        while (1)
+        {
+            memblock_t    *next = block->next;
+            Z_Free((char *)block + HEADER_SIZE);
+            if (block == end_block)
+            {
+                break;
+            }
+            block = next; // Advance to next block
+        }
     }
 }
 
-
-//
-// Z_FileDumpHeap
-//
-void Z_FileDumpHeap (FILE* f)
+void Z_ChangeTag(void *ptr, int32_t tag)
 {
-    memblock_t*	block;
-	
-    fprintf (f,"zone size: %i  location: %p\n",mainzone->size,mainzone);
-	
-    for (block = mainzone->blocklist.next ; ; block = block->next)
+    memblock_t    *block = (memblock_t *)((char *)ptr - HEADER_SIZE);
+
+    // proff - added sanity check, this can happen when an empty lump is locked
+    if (!ptr)
     {
-	fprintf (f,"block:%p    size:%7i    user:%p    tag:%3i\n",
-		 block, block->size, block->user, block->tag);
-		
-	if (block->next == &mainzone->blocklist)
-	{
-	    // all blocks have been hit
-	    break;
-	}
-	
-	if ( (byte *)block + block->size != (byte *)block->next)
-	    fprintf (f,"ERROR: block size does not touch the next block\n");
-
-	if ( block->next->prev != block)
-	    fprintf (f,"ERROR: next block doesn't have proper back link\n");
-
-	if (block->tag == PU_FREE && block->next->tag == PU_FREE)
-	    fprintf (f,"ERROR: two consecutive free blocks\n");
+        return;
     }
-}
-
-
-
-//
-// Z_CheckHeap
-//
-void Z_CheckHeap (void)
-{
-    memblock_t*	block;
-	
-    for (block = mainzone->blocklist.next ; ; block = block->next)
+    // proff - do nothing if tag doesn't differ
+    if (tag == block->tag)
     {
-	if (block->next == &mainzone->blocklist)
-	{
-	    // all blocks have been hit
-	    break;
-	}
-	
-	if ( (byte *)block + block->size != (byte *)block->next)
-	    I_Error ("Z_CheckHeap: block size does not touch the next block\n");
-
-	if ( block->next->prev != block)
-	    I_Error ("Z_CheckHeap: next block doesn't have proper back link\n");
-
-	if (block->tag == PU_FREE && block->next->tag == PU_FREE)
-	    I_Error ("Z_CheckHeap: two consecutive free blocks\n");
+        return;
     }
-}
 
+    if (block == block->next)
+    {
+        blockbytag[block->tag] = NULL;
+    }
+    else if (blockbytag[block->tag] == block)
+    {
+        blockbytag[block->tag] = block->next;
+    }
+    block->prev->next = block->next;
+    block->next->prev = block->prev;
 
-
-
-//
-// Z_ChangeTag
-//
-void Z_ChangeTag2(void *ptr, int tag, char *file, int line)
-{
-    memblock_t*	block;
-	
-    block = (memblock_t *) ((byte *)ptr - sizeof(memblock_t));
-
-    if (block->id != ZONEID)
-        I_Error("%s:%i: Z_ChangeTag: block without a ZONEID!",
-                file, line);
-
-    if (tag >= PU_PURGELEVEL && block->user == NULL)
-        I_Error("%s:%i: Z_ChangeTag: an owner is required "
-                "for purgable blocks", file, line);
+    if (!blockbytag[tag])
+    {
+        blockbytag[tag] = block;
+        block->next = block->prev = block;
+    }
+    else
+    {
+        blockbytag[tag]->prev->next = block;
+        block->prev = blockbytag[tag]->prev;
+        block->next = blockbytag[tag];
+        blockbytag[tag]->prev = block;
+    }
 
     block->tag = tag;
 }
 
-
-
-//
-// Z_FreeMemory
-//
-int Z_FreeMemory (void)
+void *Z_Realloc(void *ptr, size_t n, int32_t tag, void **user)
 {
-    memblock_t*		block;
-    int			free;
-	
-    free = 0;
-    
-    for (block = mainzone->blocklist.next ;
-         block != &mainzone->blocklist;
-         block = block->next)
+    void    *p = Z_Malloc(n, tag, user);
+
+    if (ptr)
     {
-        if (block->tag == PU_FREE || block->tag >= PU_PURGELEVEL)
-            free += block->size;
+        memblock_t    *block = (memblock_t *)((char *)ptr - HEADER_SIZE);
+        memcpy(p, ptr, n <= block->size ? n : block->size);
+        Z_Free(ptr);
+        if (user) // in case Z_Free nullified same user
+        {
+            *user = p;
+        }
     }
-
-    return free;
+    return p;
 }
 
-unsigned int Z_ZoneSize(void)
+void *Z_Calloc(size_t n1, size_t n2, int32_t tag, void **user)
 {
-    return mainzone->size;
+    return (n1 *= n2) ? memset(Z_Malloc(n1, tag, user), 0, n1) : NULL;
 }
 
+char *Z_Strdup(const char *s, int32_t tag, void **user)
+{
+    return strcpy((char *)Z_Malloc(strlen(s) + 1, tag, user), s);
+}
+
+void Z_CheckHeap(void)
+{
+}

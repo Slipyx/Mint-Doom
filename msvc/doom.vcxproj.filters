@@ -99,9 +99,6 @@
     <ClCompile Include="..\src\i_main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\i_oplmusic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\i_pcsound.c">
       <Filter>Source Files</Filter>
     </ClCompile>

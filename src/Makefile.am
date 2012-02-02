@@ -3,7 +3,7 @@ gamesdir = $(prefix)/games
 
 games_PROGRAMS = @PROGRAM_PREFIX@doom @PROGRAM_PREFIX@server
 
-AM_CFLAGS = -I../opl -I../textscreen -I../pcsound @SDLMIXER_CFLAGS@ @SDLNET_CFLAGS@
+AM_CFLAGS = -I../textscreen -I../pcsound @SDLMIXER_CFLAGS@ @SDLNET_CFLAGS@
 
 DEDSERV_FILES=\
 d_dedicated.c                              \
@@ -19,10 +19,10 @@ net_sdl.c            net_sdl.h             \
 net_query.c          net_query.h           \
 net_server.c         net_server.h          \
 net_structrw.c       net_structrw.h        \
-z_native.c           z_zone.h
+z_zone.c             z_zone.h
 
 @PROGRAM_PREFIX@server_SOURCES=$(DEDSERV_FILES)
-@PROGRAM_PREFIX@server_LDADD = ../wince/libc_wince.a @LDFLAGS@ @SDLNET_LIBS@ 
+@PROGRAM_PREFIX@server_LDADD = @LDFLAGS@ @SDLNET_LIBS@ 
 
 MAIN_SOURCE_FILES=\
 am_map.c             am_map.h              \
@@ -156,7 +156,6 @@ FEATURE_SOUND_SOURCE_FILES =               \
 i_pcsound.c                                \
 i_sdlsound.c                               \
 i_sdlmusic.c                               \
-i_oplmusic.c                               \
 midifile.c           midifile.h            \
 mus2mid.c            mus2mid.h
 
@@ -173,10 +172,8 @@ else
 endif
 
 @PROGRAM_PREFIX@doom_LDADD =                         \
-                       ../wince/libc_wince.a         \
                        ../textscreen/libtextscreen.a \
                        ../pcsound/libpcsound.a       \
-                       ../opl/libopl.a               \
                        @LDFLAGS@                     \
                        @SDLMIXER_LIBS@               \
                        @SDLNET_LIBS@

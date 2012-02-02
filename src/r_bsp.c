@@ -370,7 +370,7 @@ int32_t    checkcoord[12][4] =
     {2,1,3,0}
 };
 
-boolean R_CheckBBox(fixed_t *bspcoord)
+boolean R_CheckBBox(const fixed_t *bspcoord)
 {
     int32_t        boxx;
     int32_t        boxy;
@@ -563,36 +563,27 @@ void R_Subsector(int32_t num)
 //  traversing subtree recursively.
 // Just call with BSP root.
 //
+// JoshK: Ported from PRBoom.
+// killough 5/2/98: reformatted, removed tail recursion
+//
 void R_RenderBSPNode(int32_t bspnum)
 {
-    node_t     *bsp;
-    int32_t    side;
-
-    // Found a subsector?
-    if (bspnum & NF_SUBSECTOR)
+    while (!(bspnum & NF_SUBSECTOR))    // Found a subsector?
     {
-        if (bspnum == -1)
+        const node_t    *bsp = &nodes[bspnum];
+
+        // Decide which side the view point is on.
+        int32_t    side = R_PointOnSide(viewx, viewy, bsp);
+        // Recursively divide front space.
+        R_RenderBSPNode(bsp->children[side]);
+
+        // Possibly divide back space.
+
+        if (!R_CheckBBox(bsp->bbox[side ^ 1]))
         {
-            R_Subsector(0);
+            return;
         }
-        else
-        {
-            R_Subsector(bspnum & (~NF_SUBSECTOR));
-        }
-        return;
+        bspnum = bsp->children[side ^ 1];
     }
-
-    bsp = &nodes[bspnum];
-
-    // Decide which side the view point is on.
-    side = R_PointOnSide(viewx, viewy, bsp);
-
-    // Recursively divide front space.
-    R_RenderBSPNode(bsp->children[side]);
-
-    // Possibly divide back space.
-    if (R_CheckBBox(bsp->bbox[side ^ 1]))
-    {
-        R_RenderBSPNode(bsp->children[side ^ 1]);
-    }
+    R_Subsector(bspnum == -1 ? 0 : bspnum & ~NF_SUBSECTOR);
 }

@@ -7,13 +7,13 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\msvc;..\src;..\textscreen;..\opl;..\pcsound;C:\MyC\SDL-1.2.14\include\SDL</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\msvc;..\src;..\textscreen;..\pcsound;C:\MyC\SDL-1.2.14\include\SDL</AdditionalIncludeDirectories>
     </ClCompile>
     <Lib>
       <AdditionalLibraryDirectories>C:\MyC\SDL-1.2.14\lib</AdditionalLibraryDirectories>
     </Lib>
     <Link>
-      <AdditionalLibraryDirectories>C:\MyC\SDL-1.2.14\lib;.\Release\libopl;.\Release\libpcsound;.\Release\libtextscreen</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\MyC\SDL-1.2.14\lib;.\Release\libpcsound;.\Release\libtextscreen</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />

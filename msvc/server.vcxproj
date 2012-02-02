@@ -7,12 +7,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{6F6542FF-D2ED-48E9-8EE3-1219183AA1ED}</ProjectGuid>
-    <RootNamespace>libopl</RootNamespace>
+    <ProjectGuid>{3FBED9B4-A50B-4D25-B465-6AE226AAB203}</ProjectGuid>
+    <RootNamespace>dedicated</RootNamespace>
+    <ProjectName>server</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
@@ -25,45 +26,56 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\$(ProjectName)\</OutDir>
+    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IntDir>$(Configuration)\$(ProjectName)\</IntDir>
+    <TargetName>mint-$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>SDL.lib;SDLmain.lib;SDL_net.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <Lib>
-      <AdditionalDependencies>SDL_mixer.lib</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\opl\dbopl.c" />
-    <ClCompile Include="..\opl\ioperm_sys.c" />
-    <ClCompile Include="..\opl\opl.c" />
-    <ClCompile Include="..\opl\opl_linux.c" />
-    <ClCompile Include="..\opl\opl_obsd.c" />
-    <ClCompile Include="..\opl\opl_queue.c" />
-    <ClCompile Include="..\opl\opl_sdl.c" />
-    <ClCompile Include="..\opl\opl_timer.c" />
-    <ClCompile Include="..\opl\opl_win32.c" />
+    <ClCompile Include="..\src\d_dedicated.c" />
+    <ClCompile Include="..\src\i_main.c" />
+    <ClCompile Include="..\src\i_timer.c" />
+    <ClCompile Include="..\src\m_argv.c" />
+    <ClCompile Include="..\src\m_misc.c" />
+    <ClCompile Include="..\src\net_common.c" />
+    <ClCompile Include="..\src\net_dedicated.c" />
+    <ClCompile Include="..\src\net_io.c" />
+    <ClCompile Include="..\src\net_packet.c" />
+    <ClCompile Include="..\src\net_query.c" />
+    <ClCompile Include="..\src\net_sdl.c" />
+    <ClCompile Include="..\src\net_server.c" />
+    <ClCompile Include="..\src\net_structrw.c" />
+    <ClCompile Include="..\src\z_zone.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\opl\dbopl.h" />
-    <ClInclude Include="..\opl\ioperm_sys.h" />
-    <ClInclude Include="..\opl\opl.h" />
-    <ClInclude Include="..\opl\opl_internal.h" />
-    <ClInclude Include="..\opl\opl_queue.h" />
-    <ClInclude Include="..\opl\opl_timer.h" />
+    <ClInclude Include="..\src\i_timer.h" />
+    <ClInclude Include="..\src\m_argv.h" />
+    <ClInclude Include="..\src\m_misc.h" />
+    <ClInclude Include="..\src\net_common.h" />
+    <ClInclude Include="..\src\net_dedicated.h" />
+    <ClInclude Include="..\src\net_io.h" />
+    <ClInclude Include="..\src\net_packet.h" />
+    <ClInclude Include="..\src\net_query.h" />
+    <ClInclude Include="..\src\net_sdl.h" />
+    <ClInclude Include="..\src\net_server.h" />
+    <ClInclude Include="..\src\net_structrw.h" />
+    <ClInclude Include="..\src\z_zone.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

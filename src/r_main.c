@@ -158,7 +158,7 @@ int
 R_PointOnSide
 ( fixed_t	x,
   fixed_t	y,
-  node_t*	node )
+  const node_t*	node )
 {
     fixed_t	dx;
     fixed_t	dy;
